@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Test</title>
+  </head>
+  <body>
+    <h1>Hey</h1>
+    <img id="cam-viewer" style="width: 10rem;" />
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const camViewer = document.getElementById('cam-viewer')
+    const socket = io()
+    socket.on('Hello', (e, a) => {
+      console.log('Hey')
+      console.log(e)
+    })
+    
+    socket.on('frame', (e, a) => {
+      console.log(e)
+      camViewer.src = e
+    })
+  </script>
+</html>
