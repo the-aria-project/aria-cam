@@ -10,7 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
-    "pi-camera": "^1.7.0",
-    "socket.io": "^4.5.4"
+    "raspivid-jpeg-stream": "^1.0.0",
+    "socket.io": "^4.5.4",
+    "socket.io-client": "^4.5.4"
   }
 }

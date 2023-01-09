@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Test</title>
+    <style>
+      .cam-container {
+        width: 100%;
+      }
+
+      .cam-container img {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hey</h1>
+    <div id="cam-container">
+
+    </div>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const camContainer = document.getElementById('cam-container')
+    const socket = io()
+    
+    socket.on('camera:frame', ({ mimeType, buffer }) => {
+      camContainer.innerHTML = `<img src="data:${mimeType};base64, ${buffer}" />`
+    })
+  </script>
+</html>
