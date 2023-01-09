@@ -9,7 +9,7 @@ const RaspividJpegStream = require('raspivid-jpeg-stream')
 const app = express()
 const server = http.Server(app)
 const io = socketIO(server)
-const config = require('./config.json')
+const config = require('../config.json')
 
 let clients = []
 let servers = []
