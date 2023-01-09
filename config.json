@@ -11,8 +11,8 @@
     "live_view_path": "/live"
   },
   "camera": {
-    "width": 1920,
-    "height": 1080,
+    "width": 1280,
+    "height": 720,
     "framerate": 24
   }
 }

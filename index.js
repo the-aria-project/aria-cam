@@ -13,6 +13,11 @@ const config = require('./config.json')
 
 let clients = []
 let servers = []
+const startTime = new Date()
+let serverConnects = 0
+let serverDisconnects = 0
+let clientConnects = 0
+let clientDisconnects = 0
 
 const camera = new RaspividJpegStream({
   width: config.camera.width,
@@ -45,10 +50,12 @@ camera.on('data', frameHandler)
 
 // Clients
 io.on('connection', socket => {
+  clientConnects++
   console.log(`${socket.id} connected`)
   clients.push(socket)
 
   socket.on('disconnect', socket => {
+    clientDisconnects++
     console.log(`${socket.id} disconnected`)
     clients = clients.filter(s => s.id !== socket.id)
   })
@@ -60,11 +67,13 @@ config.destinations.forEach(dest => {
   const socket = socketIOClient(`${dest.ssl ? 'https' : 'http'}://${dest.host}:${dest.port}`)
 
   socket.on('connect', () => {
+    serverConnects++
     console.log(`[${socket.id}] Connected to ${dest.host}`)
     servers.push(socket)
   })
 
   socket.on('disconnect', () => {
+    serverDisconnects++
     console.log(`[${socket.id}] Disconnected from ${dest.host}`)
     servers = servers.filter(s => s.id !== socket.id)
   })
@@ -75,13 +84,27 @@ app.get(config.server['live_view_path'], (req, res) => {
   res.sendFile(path.resolve(__dirname, 'live-view.html'))
 })
 
-app.get('/reset', (req, res) => {
-  // Reset the camera
+app.get('/health-check', (req, res) => {
+  // Return camera details and health
+  res.send({
+    camera: config.camera,
+    up_time: new Date().getTime() - startTime.getTime(),
+    connections: {
+      clients: {
+        connects: clientConnects,
+        disconnects: clientDisconnects,
+      },
+      servers: {
+        connects: serverConnects,
+        disconnects: serverDisconnects
+      }
+    }
+  })
 })
 
 server.listen(config.server.port, () => {
   console.log(`Camera server running on port ${config.server.port}`)
-  console.log(`View your camera live at http://${os.hostname()}:${[8080, 80].includes(config.server.port) ? config.server.live_view_path : `:${config.server.port}${config.server.live_view_path}`}`)
+  console.log(`View your camera live at http://${os.hostname()}${[8080, 80].includes(config.server.port) ? config.server.live_view_path : `:${config.server.port}${config.server.live_view_path}`}`)
 
   console.log(`Camera Config: ${config.camera.width}x${config.camera.height}@${config.camera.framerate}fps`)
   console.log(`\n__Configured detinations__`)
