@@ -1,0 +1,14 @@
+{
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "compilerOptions": {
+    "target": "es6",
+    "rootDir": ".",
+    "outDir": "./dist",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "include": ["./src/**/*", "./config.json", "./src/live-view.html"],
+  "exclude": ["./node_modules"]
+}

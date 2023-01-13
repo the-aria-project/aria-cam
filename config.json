@@ -1,8 +1,8 @@
 {
   "destinations": [
     {
-      "host": "test.local",
-      "port": 4000,
+      "host": "",
+      "port": 3000,
       "ssl": false
     }
   ],
@@ -13,6 +13,7 @@
   "camera": {
     "width": 1280,
     "height": 720,
-    "framerate": 24
+    "framerate": 24,
+    "reset_interval": 30000
   }
 }
