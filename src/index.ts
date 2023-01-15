@@ -4,14 +4,16 @@ import express, { Request, Response } from 'express'
 import socketIO, { Socket as ServerSocket } from 'socket.io'
 import socketIOClient, { Socket as ClientSocket } from 'socket.io-client'
 import http from 'http'
-import { ConfigDestination } from 'aria-types'
+import { socketEvents } from 'aria-lib'
+import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import Camera from './Camera'
 import devLog from './lib/devLog'
+import config from '../config.json'
 
 const app = express()
 const server = new http.Server(app)
 const io = new socketIO.Server(server)
-import config from '../config.json'
+const hostname = os.hostname()
 
 // State
 let clients: ServerSocket[] = []
@@ -30,20 +32,30 @@ const camera = new Camera({
 })
 
 const frameHandler = (frame: Buffer) => {
-  const mimeType = 'image/jpg'
-  const b64Buffer = Buffer.from(frame).toString('base64')
+  const cameraFrame: CameraFrame = {
+    mimeType: 'image/jpg',
+    buffer: Buffer.from(frame).toString('base64'),
+    timestamp: new Date().getTime(),
+    camera: {
+      width: config.camera.width,
+      height: config.camera.height,
+      fps: config.camera.framerate,
+      host: hostname,
+      friendly_name: config.camera_friendly_name,
+    },
+  }
 
   // Emit event to clients
   clients.forEach(socket => {
     if (socket) {
-      socket.emit('camera:frame', { mimeType, buffer: b64Buffer })
+      socket.emit(socketEvents.camera.frame, cameraFrame)
     }
   })
 
   // Emit event to servers
   servers.forEach(socket => {
     if (socket) {
-      socket.emit('camera:frame', { mimeType, buffer: b64Buffer })
+      socket.emit(socketEvents.camera.frame, cameraFrame)
     }
   })
 }
@@ -94,7 +106,7 @@ config.destinations.forEach((dest: ConfigDestination) => {
 })
 
 // Endpoints
-app.get(config.server['live_view_path'], (req: Request, res: Response) => {
+app.get('/live', (req: Request, res: Response) => {
   res.sendFile(path.resolve(__dirname, 'live-view.html'))
 })
 
@@ -122,8 +134,8 @@ server.listen(config.server.port, () => {
   devLog(
     `View your camera live at http://${os.hostname()}${
       [8080, 80].includes(config.server.port)
-        ? config.server.live_view_path
-        : `:${config.server.port}${config.server.live_view_path}`
+        ? '/live'
+        : `:${config.server.port}/live`
     }`
   )
 
