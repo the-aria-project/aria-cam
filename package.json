@@ -1,16 +1,17 @@
 {
   "name": "aria-cam",
   "version": "1.0.0",
-  "description": "",
+  "description": "Wifi Camera for ARIA ecosystem",
   "main": "dist/src/index.js",
   "scripts": {
-    "start": "nodemon dist/index.js",
-    "dev": "nodemon ./src/index.ts",
+    "start": "npm run build && nodemon dist/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon ./src/index.ts",
     "build": "rm -rf ./dist && tsc && cp ./src/live-view.html ./dist/src/",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "lint-fix": "eslint . --ext .ts --fix"
   },
-  "author": "",
+  "author": "Brandon Carr",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
@@ -26,6 +27,7 @@
     "@typescript-eslint/eslint-plugin": "^5.48.1",
     "@typescript-eslint/parser": "^5.48.1",
     "aria-types": "^1.0.4",
+    "cross-env": "^7.0.3",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
     "husky": "^8.0.3",
