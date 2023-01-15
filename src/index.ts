@@ -1,4 +1,3 @@
-import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import express, { Request, Response } from 'express'
@@ -7,13 +6,12 @@ import socketIOClient, { Socket as ClientSocket } from 'socket.io-client'
 import http from 'http'
 import { ConfigDestination } from 'aria-types'
 import Camera from './Camera'
-import { Config } from './types'
 import devLog from './lib/devLog'
 
 const app = express()
 const server = new http.Server(app)
 const io = new socketIO.Server(server)
-const config: Config = require('../config.json')
+import config from '../config.json'
 
 // State
 let clients: ServerSocket[] = []
