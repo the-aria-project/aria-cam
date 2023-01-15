@@ -1,7 +1,7 @@
-import { ConfigDestination } from "aria-types"
+import { ConfigDestination } from 'aria-types'
 
 export type Config = {
-  destinations: ConfigDestination[],
+  destinations: ConfigDestination[]
   server: {
     port: number
     live_view_path: string

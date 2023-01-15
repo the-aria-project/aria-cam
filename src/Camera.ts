@@ -1,5 +1,6 @@
 import SplitFrames from 'split-frames'
 import childProcess from 'child_process'
+import devLog from './lib/devLog'
 
 type CameraOptions = {
   width?: number
@@ -25,16 +26,16 @@ const defaultOptions: CameraOptions = {
   width: 640,
   height: 480,
   timeout: 0,
-  framerate: 24
+  framerate: 24,
 }
 
 class Camera implements ICamera {
-  JPEG_START;
-  JPEG_END;
-  child: any;
-  childPipe: any;
-  options;
-  
+  JPEG_START
+  JPEG_END
+  child: any
+  childPipe: any
+  options
+
   constructor(options = {}) {
     this.JPEG_START = Buffer.from('\xff\xd8', 'binary')
     this.JPEG_END = Buffer.from('\xff\xd9', 'binary')
@@ -43,19 +44,17 @@ class Camera implements ICamera {
     this.options = {
       ...defaultOptions,
       ...options,
-      codec: 'MJPEG'
+      codec: 'MJPEG',
     }
   }
 
   start() {
-    const args: string[] = [
-      '--nopreview'
-    ]
+    const args: string[] = ['--nopreview']
 
     Object.entries(this.options).forEach(([key, val]) => {
-      args.push('--' + key);
+      args.push('--' + key)
       if (val || val === 0) {
-        args.push(String(val));
+        args.push(String(val))
       }
     })
 
@@ -63,15 +62,17 @@ class Camera implements ICamera {
     args.push('-')
 
     this.child = childProcess.spawn('raspivid', args, {
-      stdio: ['ignore', 'pipe', 'inherit']
-    });
+      stdio: ['ignore', 'pipe', 'inherit'],
+    })
 
-    this.childPipe = this.child.stdout.pipe(new SplitFrames({
-      startWith: this.JPEG_START,
-      endWith: this.JPEG_END,
-    }))
+    this.childPipe = this.child.stdout.pipe(
+      new SplitFrames({
+        startWith: this.JPEG_START,
+        endWith: this.JPEG_END,
+      })
+    )
 
-    console.log('started')
+    devLog('started')
   }
 
   stop() {
@@ -81,14 +82,13 @@ class Camera implements ICamera {
   }
 
   on(event: string, handler: Function) {
-    console.log('Event started')
+    devLog('Event started')
     return this.childPipe.on(event, handler)
   }
 
   off(event: string, handler: Function) {
     return this.childPipe.off(event, handler)
   }
-  
 }
 
 export default Camera
