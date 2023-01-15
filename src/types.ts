@@ -1,10 +1,10 @@
-import { ConfigDestination } from 'aria-types'
+import { ConfigDestination } from 'aria-lib/lib/types'
 
 export type Config = {
+  camera_friendly_name: string
   destinations: ConfigDestination[]
   server: {
     port: number
-    live_view_path: string
   }
   camera: {
     width: number
