@@ -14,6 +14,7 @@
   "author": "Brandon Carr",
   "license": "ISC",
   "dependencies": {
+    "aria-lib": "^1.1.2",
     "express": "^4.18.2",
     "nodemon": "^2.0.20",
     "socket.io": "^4.5.4",
@@ -26,7 +27,6 @@
     "@types/node": "^18.11.18",
     "@typescript-eslint/eslint-plugin": "^5.48.1",
     "@typescript-eslint/parser": "^5.48.1",
-    "aria-types": "^1.0.4",
     "cross-env": "^7.0.3",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
