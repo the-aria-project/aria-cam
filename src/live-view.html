@@ -23,7 +23,7 @@
     const camContainer = document.getElementById('cam-container')
     const socket = io()
     
-    socket.on('camera:frame', ({ mimeType, buffer }) => {
+    socket.on('aria:camera:frame', ({ mimeType, buffer }) => {
       camContainer.innerHTML = `<img src="data:${mimeType};base64, ${buffer}" />`
     })
   </script>
