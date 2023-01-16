@@ -61,7 +61,7 @@ class Camera implements ICamera {
     args.push('-o')
     args.push('-')
 
-    console.log(args)
+    console.log(`raspivid ${args.join(' ')}`)
     
     this.child = childProcess.spawn('raspivid', args, {
       stdio: ['ignore', 'pipe', 'inherit'],
