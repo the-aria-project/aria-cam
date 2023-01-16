@@ -66,9 +66,9 @@ camera.on('data', frameHandler)
 
 // Restart camera to preserve memory every x ms
 setInterval(() => {
-  devLog('Rebooting camera')
-  camera.off('data', frameHandler)
-  camera.on('data', frameHandler)
+  // devLog('Rebooting camera')
+  // camera.off('data', frameHandler)
+  // camera.on('data', frameHandler)
 }, config.camera.reset_interval)
 
 // Clients
