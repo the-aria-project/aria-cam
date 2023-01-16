@@ -1,15 +1,14 @@
 {
   "camera_friendly_name": "ARIA Camera",
-  "destinations": [
+  "server_port": 3000,
+  "record_locally": true,
+  "frame_destinations": [
     {
       "host": "",
       "port": 3000,
       "ssl": false
     }
   ],
-  "server": {
-    "port": 3000
-  },
   "camera": {
     "width": 1280,
     "height": 720,

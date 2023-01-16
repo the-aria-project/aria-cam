@@ -87,7 +87,7 @@ io.on('connection', (socket: ServerSocket) => {
 })
 
 // Servers
-config.destinations.forEach((dest: ConfigDestination) => {
+config.frame_destinations.forEach((dest: ConfigDestination) => {
   const socket = socketIOClient(
     `${dest.ssl ? 'https' : 'http'}://${dest.host}:${dest.port}`
   )
@@ -129,13 +129,13 @@ app.get('/health-check', (req: Request, res: Response) => {
 })
 
 // Start server
-server.listen(config.server.port, () => {
-  devLog(`Camera server running on port ${config.server.port}`)
+server.listen(config.server_port, () => {
+  devLog(`Camera server running on port ${config.server_port}`)
   devLog(
     `View your camera live at http://${os.hostname()}${
-      [8080, 80].includes(config.server.port)
+      [8080, 80].includes(config.server_port)
         ? '/live'
-        : `:${config.server.port}/live`
+        : `:${config.server_port}/live`
     }`
   )
 
@@ -143,7 +143,7 @@ server.listen(config.server.port, () => {
     `Camera Config: ${config.camera.width}x${config.camera.height}@${config.camera.framerate}fps`
   )
   devLog(`\n__Configured detinations__`)
-  config.destinations.forEach((dest: ConfigDestination) => {
+  config.frame_destinations.forEach((dest: ConfigDestination) => {
     devLog(`${dest.ssl ? 'https' : 'http'}://${dest.host}:${dest.port}`)
   })
 })
