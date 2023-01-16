@@ -17,7 +17,6 @@ interface ICamera {
   childPipe: any
   options: CameraOptions
   start: () => void
-  stop: () => void
   on: (event: string, handler: Function) => any
   off: (event: string, handler: Function) => any
 }
@@ -73,12 +72,6 @@ class Camera implements ICamera {
     )
 
     devLog('started')
-  }
-
-  stop() {
-    this.child.kill('SIGINT')
-    this.child = null
-    this.childPipe = null
   }
 
   on(event: string, handler: Function) {

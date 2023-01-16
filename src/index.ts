@@ -68,8 +68,6 @@ camera.on('data', frameHandler)
 setInterval(() => {
   devLog('Rebooting camera')
   camera.off('data', frameHandler)
-  camera.stop()
-  camera.start()
   camera.on('data', frameHandler)
 }, config.camera.reset_interval)
 
