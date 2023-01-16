@@ -35,14 +35,14 @@ const frameHandler = (frame: Buffer) => {
   const cameraFrame: CameraFrame = {
     mimeType: 'image/jpg',
     buffer: Buffer.from(frame).toString('base64'),
-    timestamp: new Date().getTime(),
-    camera: {
-      width: config.camera.width,
-      height: config.camera.height,
-      fps: config.camera.framerate,
-      host: hostname,
-      friendly_name: config.camera_friendly_name,
-    },
+    // timestamp: new Date().getTime(),
+    // camera: {
+    //   width: config.camera.width,
+    //   height: config.camera.height,
+    //   fps: config.camera.framerate,
+    //   host: hostname,
+    //   friendly_name: config.camera_friendly_name,
+    // },
   }
 
   // Emit event to clients

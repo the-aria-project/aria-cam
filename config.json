@@ -12,7 +12,7 @@
   "camera": {
     "width": 1280,
     "height": 720,
-    "framerate": 24,
+    "framerate": 20,
     "reset_interval": 30000
   }
 }
