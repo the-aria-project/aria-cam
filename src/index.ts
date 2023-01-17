@@ -9,6 +9,9 @@ import '@tensorflow/tfjs-backend-cpu'
 import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import devLog from './lib/devLog'
 import config from '../config.json'
+
+const tf = require('@tensorflow/tfjs-node')
+const cocoSsd = require('@tensorflow-models/coco-ssd')
 // import frameHandler from './lib/frameHandler'
 
 const hostname = os.hostname()
@@ -33,6 +36,8 @@ let predictionWorker: Worker
 
 const _init = async () => {
   try {
+    const model = await cocoSsd.load({ base: 'mobilenet_v2' })
+    devLog('Coco Ssd model loaded')
 
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
       workerData: {
@@ -43,9 +48,7 @@ const _init = async () => {
       }
     })
 
-    predictionWorker = new Worker(path.join(__dirname, '../workers/object-prediction-worker.js'))
-
-    videoFrameWorker.on('message', (chunk: Buffer) => {
+    videoFrameWorker.on('message', async (chunk: Buffer) => {
       const cameraFrame: CameraFrame = {
         mimeType: 'image/jpg',
         buffer: Buffer.from(chunk).toString('base64'),
@@ -59,14 +62,17 @@ const _init = async () => {
         },
       }
 
-      predictionWorker.postMessage({
-        cameraFrame,
-        chunk,
-      })
-    })
+      const imageData = tf.node.decodeImage(chunk)
+      const detection = await model.detect(
+        imageData,
+        config.object_detection_options.max_objects,
+        config.object_detection_options.sensitivity
+      )
 
-    predictionWorker.on('message', (newCameraFrame: CameraFrame) => {
-      console.log(newCameraFrame?.predictions?.length)
+      cameraFrame.predictions = detection
+      imageData.dispose()
+
+      console.log(cameraFrame?.predictions?.length)
     })
 
   } catch (err) {
