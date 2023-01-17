@@ -73,19 +73,11 @@ const _init = async () => {
         }
       })
 
-      predictionWorker.postMessage({
-        cameraFrame,
-        chunk
-      })
+      predictionWorker.postMessage(cameraFrame)
     })
 
-    predictionWorker.on('message', (cameraFrame: CameraFrame, predictions: DetectedObject[]) => {
-      const newFrame: CameraFrame = {
-        ...cameraFrame,
-        predictions,
-      }
-
-      console.log(predictions)
+    predictionWorker.on('message', (cameraFrame: CameraFrame) => {
+      console.log(cameraFrame?.predictions)
     })
 
   } catch (err) {
