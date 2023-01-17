@@ -1,12 +1,11 @@
-require('@tensorflow/tfjs-backend-cpu')
 const tf = require('@tensorflow/tfjs-node')
-const { workerData, parentPort } = require('worker_threads')
+const cocoSsd = require('@tensorflow-models/coco-ssd')
+const { parentPort } = require('worker_threads')
 const config = require('../config.json')
 
-const { model } = workerData
 console.log('Object prediction worker starting')
 
-const predictObjects = async (cameraFrame) => {
+const predictObjects = async (model, cameraFrame) => {
   try {
     const imageData = tf.node.decodeImage(cameraFrame, buffer)
     const detection = await model.detect(
@@ -22,7 +21,14 @@ const predictObjects = async (cameraFrame) => {
   }
 }
 
-parentPort.on('message', (cameraFrame) => {
-  const newFrame = predictObjects(cameraFrame)
-  parentPort.postMessage(newFrame)
-})
+// Add modelUrl?
+cocoSsd.load({ base: 'mobilenet_v2' })
+  .then(model => {
+    parentPort.on('message', async (cameraFrame) => {
+      const newFrame = await predictObjects(model, cameraFrame)
+      parentPort.postMessage(newFrame)
+    })
+  })
+  .catch(err => {
+    throw err
+  })

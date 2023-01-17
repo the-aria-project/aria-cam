@@ -5,17 +5,15 @@ import socketIO, { Socket as ServerSocket } from 'socket.io'
 import socketIOClient, { Socket as ClientSocket } from 'socket.io-client'
 import http from 'http'
 import { Worker } from 'worker_threads'
+import '@tensorflow/tfjs-backend-cpu'
 import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import devLog from './lib/devLog'
 import config from '../config.json'
-import frameHandler from './lib/frameHandler'
-
-const cocoSsd = require('@tensorflow-models/coco-ssd')
+// import frameHandler from './lib/frameHandler'
 
 const hostname = os.hostname()
 
 // Objects
-let model
 const app = express()
 const server = new http.Server(app)
 const io = new socketIO.Server(server)
@@ -35,8 +33,6 @@ let predictionWorker: Worker
 
 const _init = async () => {
   try {
-    model = await cocoSsd.load({ base: 'mobilenet_v2' })
-    console.log(model)
 
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
       workerData: {
@@ -47,11 +43,7 @@ const _init = async () => {
       }
     })
 
-    predictionWorker = new Worker(path.join(__dirname, '../workers/object-prediction-worker.js'), {
-      workerData: {
-        model
-      }
-    })
+    predictionWorker = new Worker(path.join(__dirname, '../workers/object-prediction-worker.js'))
 
     videoFrameWorker.on('message', (chunk: Buffer) => {
       const cameraFrame: CameraFrame = {
