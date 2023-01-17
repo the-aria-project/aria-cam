@@ -14,9 +14,9 @@ const predictObjects = async (chunk) => {
       config.object_detection_options.max_objects,
       config.object_detection_options.sensitivity
     )
-    output = detection
+    output = { chunk, predictions: detection }
     imageData.dispose()
-    return detection
+    return output
   } catch (err) {
     throw err
   }

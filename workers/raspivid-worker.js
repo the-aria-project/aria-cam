@@ -1,6 +1,6 @@
 const SplitFrames = require('split-frames')
 const childProcess = require('child_process')
-const { workerData, parentPort } = require('worker_threads')
+const { workerData } = require('worker_threads')
 
 const {
   width,
