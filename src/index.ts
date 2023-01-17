@@ -35,6 +35,7 @@ let predictionWorker: Worker
 const _init = async () => {
   try {
     model = await cocoSsd.load({ base: 'mobilenet_v2' })
+    console.log(model)
 
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
       workerData: {
