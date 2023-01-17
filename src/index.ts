@@ -5,11 +5,12 @@ import socketIO, { Socket as ServerSocket } from 'socket.io'
 import socketIOClient, { Socket as ClientSocket } from 'socket.io-client'
 import http from 'http'
 import { Worker } from 'worker_threads'
-import cocoSsd from '@tensorflow-models/coco-ssd'
 import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import devLog from './lib/devLog'
 import config from '../config.json'
 import frameHandler from './lib/frameHandler'
+
+const cocoSsd = require('@tensorflow-models/coco-ssd')
 
 const hostname = os.hostname()
 
