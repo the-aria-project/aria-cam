@@ -6,6 +6,7 @@ import socketIOClient, { Socket as ClientSocket } from 'socket.io-client'
 import http from 'http'
 import { Worker } from 'worker_threads'
 import '@tensorflow/tfjs-backend-cpu'
+import { socketEvents } from "aria-lib"
 import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import devLog from './lib/devLog'
 import config from '../config.json'
@@ -50,19 +51,32 @@ const _init = async () => {
     })
 
     videoFrameWorker.on('message', async (chunk: Buffer) => {
-      console.log('frame')
-      // const cameraFrame: CameraFrame = {
-      //   mimeType: 'image/jpg',
-      //   buffer: Buffer.from(chunk).toString('base64'),
-      //   timestamp: new Date().getTime(),
-      //   camera: {
-      //     width: config.camera.width,
-      //     height: config.camera.height,
-      //     fps: config.camera.framerate,
-      //     host: hostname,
-      //     friendly_name: config.camera_friendly_name,
-      //   },
-      // }
+      const cameraFrame: CameraFrame = {
+        mimeType: 'image/jpg',
+        buffer: Buffer.from(chunk).toString('base64'),
+        timestamp: new Date().getTime(),
+        camera: {
+          width: config.camera.width,
+          height: config.camera.height,
+          fps: config.camera.framerate,
+          host: hostname,
+          friendly_name: config.camera_friendly_name,
+        },
+      }
+
+      // Emit event to clients
+      clients.forEach(socket => {
+        if (socket) {
+          socket.emit(socketEvents.camera.frame, cameraFrame)
+        }
+      })
+
+      // Emit event to servers
+      servers.forEach(socket => {
+        if (socket) {
+          socket.emit(socketEvents.camera.frame, cameraFrame)
+        }
+      })
 
       // const imageData = tf.node.decodeImage(chunk)
       // const detection = await model.detect(

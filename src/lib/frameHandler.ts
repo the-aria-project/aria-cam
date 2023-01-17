@@ -2,7 +2,6 @@ import os from 'os'
 import { Socket as ServerSocket } from "socket.io"
 import { Socket as ClientSocket } from "socket.io-client"
 import { ObjectDetection } from '@tensorflow-models/coco-ssd'
-import { socketEvents } from "aria-lib"
 import { CameraFrame } from "aria-lib/lib/types"
 import config from '../../config.json'
 
