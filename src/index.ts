@@ -9,6 +9,7 @@ import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import Camera from './Camera'
 import devLog from './lib/devLog'
 import config from '../config.json'
+import { Worker, workerData } from 'worker_threads'
 
 const app = express()
 const server = new http.Server(app)
@@ -24,12 +25,12 @@ let serverDisconnects = 0
 let clientConnects = 0
 let clientDisconnects = 0
 
-const camera = new Camera({
-  width: config.camera.width,
-  height: config.camera.height,
-  timeout: 0,
-  framerate: config.camera.framerate,
-})
+// const camera = new Camera({
+//   width: config.camera.width,
+//   height: config.camera.height,
+//   timeout: 0,
+//   framerate: config.camera.framerate,
+// })
 
 const frameHandler = (frame: Buffer) => {
   const cameraFrame: CameraFrame = {
@@ -61,8 +62,18 @@ const frameHandler = (frame: Buffer) => {
 }
 
 // Start camera and set up frame handler for data events
-camera.start()
-camera.on('data', frameHandler)
+// camera.start()
+// camera.on('data', frameHandler)
+const videoThread = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
+  workerData: {
+    width: config.camera.width,
+    height: config.camera.height,
+    timeout: 0,
+    framerate: config.camera.framerate,
+  }
+})
+
+videoThread.on('message', frameHandler)
 
 // Restart camera to preserve memory every x ms
 setInterval(() => {
