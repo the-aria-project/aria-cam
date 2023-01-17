@@ -9,9 +9,6 @@ import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import devLog from './lib/devLog'
 import config from '../config.json'
 import { DetectedObject } from '@tensorflow-models/coco-ssd'
-
-require('@tensorflow/tfjs-backend-cpu')
-const cocoSsd = require('@tensorflow-models/coco-ssd')
 // import frameHandler from './lib/frameHandler'
 
 const hostname = os.hostname()
@@ -37,14 +34,9 @@ let predictionWorker: Worker
 const _init = async () => {
   try {
     console.log('Loading models...')
-    const model = await cocoSsd.load({ base: 'lite_mobilenet_v2' })
     devLog('Coco Ssd model loaded')
 
-    predictionWorker = new Worker(path.join(__dirname, '../workers/object-prediction-worker.js'), {
-      workerData: {
-        model,
-      }
-    })
+    predictionWorker = new Worker(path.join(__dirname, '../workers/object-prediction-worker.js'))
 
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
       workerData: {
@@ -72,10 +64,6 @@ const _init = async () => {
       }
 
       console.log(predictions)
-    })
-
-    predictionWorker.on('message', (newCameraFrame: CameraFrame) => {
-      console.log(newCameraFrame?.predictions?.length)
     })
 
   } catch (err) {
