@@ -6,6 +6,7 @@ import socketIOClient, { Socket as ClientSocket } from 'socket.io-client'
 import http from 'http'
 import { Worker } from 'worker_threads'
 import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
+import { socketEvents } from 'aria-lib'
 import devLog from './lib/devLog'
 import config from '../config.json'
 import { DetectedObject } from '@tensorflow-models/coco-ssd'
@@ -33,9 +34,6 @@ let predictionWorker: Worker
 
 const _init = async () => {
   try {
-    console.log('Loading models...')
-    devLog('Coco Ssd model loaded')
-
     predictionWorker = new Worker(path.join(__dirname, '../workers/object-prediction-worker.js'))
 
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
@@ -48,7 +46,7 @@ const _init = async () => {
       }
     })
 
-    predictionWorker.on('message', (chunk: Buffer, predictions: DetectedObject[]) => {
+    videoFrameWorker.on('message', (chunk: Buffer) => {
       const cameraFrame: CameraFrame = {
         mimeType: 'image/jpg',
         buffer: Buffer.from(chunk).toString('base64'),
@@ -60,6 +58,30 @@ const _init = async () => {
           host: hostname,
           friendly_name: config.camera_friendly_name,
         },
+      }
+
+      clients.forEach(socket => {
+        if (socket) {
+          socket.emit(socketEvents.camera.frame, cameraFrame)
+        }
+      })
+    
+      // Emit event to servers
+      servers.forEach(socket => {
+        if (socket) {
+          socket.emit(socketEvents.camera.frame, cameraFrame)
+        }
+      })
+
+      predictionWorker.postMessage({
+        cameraFrame,
+        chunk
+      })
+    })
+
+    predictionWorker.on('message', (cameraFrame: CameraFrame, predictions: DetectedObject[]) => {
+      const newFrame: CameraFrame = {
+        ...cameraFrame,
         predictions,
       }
 

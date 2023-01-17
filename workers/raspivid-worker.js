@@ -1,6 +1,6 @@
 const SplitFrames = require('split-frames')
 const childProcess = require('child_process')
-const { workerData } = require('worker_threads')
+const { workerData, parentPort } = require('worker_threads')
 
 try {
   const {
@@ -8,7 +8,6 @@ try {
     height,
     timeout,
     framerate,
-    predictionWorker,
   } = workerData
 
   const JPEG_START = Buffer.from('\xff\xd8', 'binary')
@@ -46,7 +45,7 @@ try {
   )
 
   stream.on('data', chunk => {
-    predictionWorker.postMessage(chunk)
+    parentPort.postMessage(chunk)
   })
 } catch (err) {
   throw err

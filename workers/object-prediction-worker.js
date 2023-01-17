@@ -1,7 +1,7 @@
 require('@tensorflow/tfjs-backend-cpu')
 const cocoSsd = require('@tensorflow-models/coco-ssd')
 const tf = require('@tensorflow/tfjs-node')
-const { parentPort, workerData } = require('worker_threads')
+const { parentPort } = require('worker_threads')
 const config = require('../config.json')
 
 try {
@@ -25,9 +25,12 @@ try {
       }
     }
   
-    parentPort.on('message', async (chunk) => {
-      const predictions = await predictObjects(chunk)
-      parentPort.postMessage(predictions)
+    parentPort.on('message', async ({
+      cameraFrame,
+      chunk,
+    }) => {
+      const predictions = await predictObjects(cameraFrame, chunk)
+      parentPort.postMessage(cameraFrame, predictions)
     })
   }).catch(err => {
     throw err
