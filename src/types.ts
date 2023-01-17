@@ -5,6 +5,11 @@ export type Config = {
   server_port: number
   frame_destinations: ConfigDestination[]
   record_locally: boolean
+  use_object_detection: boolean,
+  object_detection_options: {
+    max_objects: number,
+    sensitivity: number
+  },
   camera: {
     width: number
     height: number
