@@ -5,9 +5,9 @@ const config = require('../config.json')
 
 console.log('Object prediction worker starting')
 
-const predictObjects = async (model, cameraFrame) => {
+const predictObjects = async (model, cameraFrame, chunk) => {
   try {
-    const imageData = tf.node.decodeImage(Buffer.from(cameraFrame.buffer.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64'))
+    const imageData = tf.node.decodeImage(chunk)
     const detection = await model.detect(
       imageData,
       config.object_detection_options.max_objects,
@@ -18,14 +18,17 @@ const predictObjects = async (model, cameraFrame) => {
     return cameraFrame
   } catch (err) {
     throw err
-    return cameraFrame
   }
 }
 
 cocoSsd.load({ base: 'mobilenet_v2' })
   .then(model => {
-    parentPort.on('message', async (cameraFrame) => {
-      const newFrame = await predictObjects(model, cameraFrame)
+    console.log('Model loaded')
+    parentPort.on('message', async ({
+      cameraFrame,
+      chunk,
+    }) => {
+      const newFrame = await predictObjects(model, cameraFrame, chunk)
       parentPort.postMessage(newFrame)
     })
   })

@@ -59,11 +59,14 @@ const _init = async () => {
         },
       }
 
-      predictionWorker.postMessage(cameraFrame)
+      predictionWorker.postMessage({
+        cameraFrame,
+        chunk,
+      })
     })
 
     predictionWorker.on('message', (newCameraFrame: CameraFrame) => {
-      console.log(Object.keys(newCameraFrame).join(':'))
+      console.log(newCameraFrame.predictions.length)
     })
 
   } catch (err) {
