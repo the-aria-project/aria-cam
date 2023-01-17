@@ -37,7 +37,7 @@ let predictionWorker: Worker
 const _init = async () => {
   try {
     console.log('Loading models...')
-    const model = await cocoSsd.load({ base: 'mobilenet_v2' })
+    const model = await cocoSsd.load({ base: 'lite_mobilenet_v2' })
     devLog('Coco Ssd model loaded')
 
     predictionWorker = new Worker(path.join(__dirname, '../workers/object-prediction-worker.js'), {
