@@ -64,6 +64,16 @@ const _init = async () => {
         },
       }
 
+      const imageData = tf.node.decodeImage(chunk)
+      const detection = await model.detect(
+        imageData,
+        config.object_detection_options.max_objects,
+        config.object_detection_options.sensitivity
+      )
+
+      cameraFrame.predictions = detection
+      imageData.dispose()
+
       // Emit event to clients
       clients.forEach(socket => {
         if (socket) {
@@ -77,18 +87,6 @@ const _init = async () => {
           socket.emit(socketEvents.camera.frame, cameraFrame)
         }
       })
-
-      // const imageData = tf.node.decodeImage(chunk)
-      // const detection = await model.detect(
-      //   imageData,
-      //   config.object_detection_options.max_objects,
-      //   config.object_detection_options.sensitivity
-      // )
-
-      // cameraFrame.predictions = detection
-      // imageData.dispose()
-
-      // console.log(cameraFrame?.predictions?.length)
     })
 
   } catch (err) {
