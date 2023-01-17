@@ -41,8 +41,7 @@ const _init = async () => {
         width: config.camera.width,
         height: config.camera.height,
         timeout: 0,
-        framerate: config.camera.framerate,
-        predictionWorker,
+        framerate: config.camera.framerate
       }
     })
 
