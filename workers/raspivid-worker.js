@@ -2,48 +2,52 @@ const SplitFrames = require('split-frames')
 const childProcess = require('child_process')
 const { workerData } = require('worker_threads')
 
-const {
-  width,
-  height,
-  timeout,
-  framerate,
-  predictionWorker,
-} = workerData
+try {
+  const {
+    width,
+    height,
+    timeout,
+    framerate,
+    predictionWorker,
+  } = workerData
 
-const JPEG_START = Buffer.from('\xff\xd8', 'binary')
-const JPEG_END = Buffer.from('\xff\xd9', 'binary')
+  const JPEG_START = Buffer.from('\xff\xd8', 'binary')
+  const JPEG_END = Buffer.from('\xff\xd9', 'binary')
 
-const options = {
-  width,
-  height,
-  timeout,
-  framerate,
-  codec: 'MJPEG'
-}
-
-const args = ['--nopreview']
-
-Object.entries(options).forEach(([key, val]) => {
-  args.push('--' + key)
-  if (val || val === 0) {
-    args.push(String(val))
+  const options = {
+    width,
+    height,
+    timeout,
+    framerate,
+    codec: 'MJPEG'
   }
-})
 
-args.push('-o')
-args.push('-')
+  const args = ['--nopreview']
 
-const child = childProcess.spawn('raspivid', args, {
-  stdio: ['ignore', 'pipe', 'inherit'],
-})
-
-const stream = child.stdout.pipe(
-  new SplitFrames({
-    startWith: JPEG_START,
-    endWith: JPEG_END,
+  Object.entries(options).forEach(([key, val]) => {
+    args.push('--' + key)
+    if (val || val === 0) {
+      args.push(String(val))
+    }
   })
-)
 
-stream.on('data', chunk => {
-  predictionWorker.postMessage(chunk)
-})
+  args.push('-o')
+  args.push('-')
+
+  const child = childProcess.spawn('raspivid', args, {
+    stdio: ['ignore', 'pipe', 'inherit'],
+  })
+
+  const stream = child.stdout.pipe(
+    new SplitFrames({
+      startWith: JPEG_START,
+      endWith: JPEG_END,
+    })
+  )
+
+  stream.on('data', chunk => {
+    predictionWorker.postMessage(chunk)
+  })
+} catch (err) {
+  throw err
+}
