@@ -35,7 +35,7 @@ let predictionWorker: Worker
 const _init = async () => {
   try {
     model = await cocoSsd.load({ base: 'mobilenet_v2' })
-    
+
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
       workerData: {
         width: config.camera.width,
@@ -66,10 +66,10 @@ const _init = async () => {
       }
 
       predictionWorker.postMessage(cameraFrame)
+    })
 
-      predictionWorker.on('message', (newCameraFrame: CameraFrame) => {
-        console.log(newCameraFrame.predictions)
-      })
+    predictionWorker.on('message', (newCameraFrame: CameraFrame) => {
+      console.log(newCameraFrame.predictions)
     })
 
   } catch (err) {
@@ -77,66 +77,72 @@ const _init = async () => {
   }
 }
 
-// Restart camera to preserve memory every x ms
-setInterval(() => {
-  // devLog('Rebooting camera')
-  // camera.off('data', frameHandler)
-  // camera.on('data', frameHandler)
-}, config.camera.reset_interval)
+_init()
+  .then(() => {
+    // Restart camera to preserve memory every x ms
+    setInterval(() => {
+      // devLog('Rebooting camera')
+      // camera.off('data', frameHandler)
+      // camera.on('data', frameHandler)
+    }, config.camera.reset_interval)
 
-// Clients
-io.on('connection', (socket: ServerSocket) => {
-  clientConnects++
-  devLog(`${socket.id} connected`)
-  clients.push(socket)
+    // Clients
+    io.on('connection', (socket: ServerSocket) => {
+      clientConnects++
+      devLog(`${socket.id} connected`)
+      clients.push(socket)
 
-  socket.on('disconnect', () => {
-    clientDisconnects++
-    devLog(`${socket.id} disconnected`)
-    clients = clients.filter(s => s.id !== socket.id)
+      socket.on('disconnect', () => {
+        clientDisconnects++
+        devLog(`${socket.id} disconnected`)
+        clients = clients.filter(s => s.id !== socket.id)
+      })
+    })
+
+    // Servers
+    config.frame_destinations.forEach((dest: ConfigDestination) => {
+      const socket = socketIOClient(
+        `${dest.ssl ? 'https' : 'http'}://${dest.host}:${dest.port}`
+      )
+
+      socket.on('connect', () => {
+        serverConnects++
+        devLog(`[${socket.id}] Connected to ${dest.host}`)
+        servers.push(socket)
+      })
+
+      socket.on('disconnect', () => {
+        serverDisconnects++
+        devLog(`[${socket.id}] Disconnected from ${dest.host}`)
+        servers = servers.filter(s => s.id !== socket.id)
+      })
+    })
+
+    // Endpoints
+    app.get('/live', (req: Request, res: Response) => {
+      res.sendFile(path.resolve(__dirname, 'live-view.html'))
+    })
+
+    // Start server
+    server.listen(config.server_port, () => {
+      devLog(`Camera server running on port ${config.server_port}`)
+      devLog(
+        `View your camera live at http://${os.hostname()}${[8080, 80].includes(config.server_port)
+          ? '/live'
+          : `:${config.server_port}/live`
+        }`
+      )
+
+      devLog(
+        `Camera Config: ${config.camera.width}x${config.camera.height}@${config.camera.framerate}fps`
+      )
+      devLog(`\n__Configured detinations__`)
+      config.frame_destinations.forEach((dest: ConfigDestination) => {
+        devLog(`${dest.ssl ? 'https' : 'http'}://${dest.host}:${dest.port}`)
+      })
+    })
   })
-})
-
-// Servers
-config.frame_destinations.forEach((dest: ConfigDestination) => {
-  const socket = socketIOClient(
-    `${dest.ssl ? 'https' : 'http'}://${dest.host}:${dest.port}`
-  )
-
-  socket.on('connect', () => {
-    serverConnects++
-    devLog(`[${socket.id}] Connected to ${dest.host}`)
-    servers.push(socket)
+  .catch(err => {
+    devLog(err)
+    process.exit(1)
   })
-
-  socket.on('disconnect', () => {
-    serverDisconnects++
-    devLog(`[${socket.id}] Disconnected from ${dest.host}`)
-    servers = servers.filter(s => s.id !== socket.id)
-  })
-})
-
-// Endpoints
-app.get('/live', (req: Request, res: Response) => {
-  res.sendFile(path.resolve(__dirname, 'live-view.html'))
-})
-
-// Start server
-server.listen(config.server_port, () => {
-  devLog(`Camera server running on port ${config.server_port}`)
-  devLog(
-    `View your camera live at http://${os.hostname()}${
-      [8080, 80].includes(config.server_port)
-        ? '/live'
-        : `:${config.server_port}/live`
-    }`
-  )
-
-  devLog(
-    `Camera Config: ${config.camera.width}x${config.camera.height}@${config.camera.framerate}fps`
-  )
-  devLog(`\n__Configured detinations__`)
-  config.frame_destinations.forEach((dest: ConfigDestination) => {
-    devLog(`${dest.ssl ? 'https' : 'http'}://${dest.host}:${dest.port}`)
-  })
-})
