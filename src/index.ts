@@ -45,7 +45,7 @@ const _init = async () => {
     console.log('Model loaded!')
 
     predictionTimer = setInterval(async () => {
-      isReadyForPrediction = false
+      isReadyForPrediction = true
     }, 2000)
 
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
@@ -72,6 +72,7 @@ const _init = async () => {
       }
 
       if (isReadyForPrediction) {
+        const s = new Date().getTime()
         console.log('Making prediction')
         isReadyForPrediction = false
         const imageData = tf.node.decodeImage(Buffer.from(cameraFrame.buffer.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64'))
@@ -81,7 +82,8 @@ const _init = async () => {
           config.object_detection_options.sensitivity
         )
         cameraFrame.predictions = detection
-        console.log('Done')
+        const e = new Date().getTime()
+        console.log(`Done in ${e - s}ms`)
       }
 
 
