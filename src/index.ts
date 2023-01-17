@@ -63,7 +63,7 @@ const _init = async () => {
     })
 
     predictionWorker.on('message', (newCameraFrame: CameraFrame) => {
-      console.log(newCameraFrame.predictions)
+      console.log(newCameraFrame)
     })
 
   } catch (err) {

@@ -24,7 +24,6 @@ const predictObjects = async (model, cameraFrame) => {
 cocoSsd.load({ base: 'mobilenet_v2' })
   .then(model => {
     parentPort.on('message', async (cameraFrame) => {
-      console.log(cameraFrame)
       const newFrame = await predictObjects(model, cameraFrame)
       parentPort.postMessage(newFrame)
     })
