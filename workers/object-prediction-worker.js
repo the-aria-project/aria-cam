@@ -1,11 +1,12 @@
 const tf = require('@tensorflow/tfjs-node')
-const cocoSsd = require('@tensorflow-models/coco-ssd')
-const { parentPort } = require('worker_threads')
+const { parentPort, workerData } = require('worker_threads')
 const config = require('../config.json')
 
 console.log('Object prediction worker starting')
+const { model } = workerData
 
-const predictObjects = async (model, cameraFrame, chunk) => {
+const predictObjects = async (chunk) => {
+  let output
   try {
     const imageData = tf.node.decodeImage(chunk)
     const detection = await model.detect(
@@ -13,25 +14,15 @@ const predictObjects = async (model, cameraFrame, chunk) => {
       config.object_detection_options.max_objects,
       config.object_detection_options.sensitivity
     )
-    cameraFrame.predictions = detection
+    output = detection
     imageData.dispose()
-    return cameraFrame
+    return detection
   } catch (err) {
     throw err
   }
 }
 
-cocoSsd.load({ base: 'lite_mobilenet_v2' })
-  .then(model => {
-    console.log('Model loaded')
-    parentPort.on('message', async ({
-      cameraFrame,
-      chunk,
-    }) => {
-      const newFrame = await predictObjects(model, cameraFrame, chunk)
-      parentPort.postMessage(newFrame)
-    })
-  })
-  .catch(err => {
-    throw err
-  })
+parentPort.on('message', async (chunk) => {
+  const predictions = await predictObjects(chunk)
+  parentPort.postMessage(predictions)
+})

@@ -6,12 +6,11 @@ import socketIOClient, { Socket as ClientSocket } from 'socket.io-client'
 import http from 'http'
 import { Worker } from 'worker_threads'
 import '@tensorflow/tfjs-backend-cpu'
-import { socketEvents } from "aria-lib"
 import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import devLog from './lib/devLog'
 import config from '../config.json'
+import { DetectedObject, ObjectDetection } from '@tensorflow-models/coco-ssd'
 
-const tf = require('@tensorflow/tfjs-node')
 const cocoSsd = require('@tensorflow-models/coco-ssd')
 // import frameHandler from './lib/frameHandler'
 
@@ -37,9 +36,14 @@ let predictionWorker: Worker
 
 const _init = async () => {
   try {
-    devLog('Loading Coco Ssd models...')
-    const model = await cocoSsd.load({ base: 'lite_mobilenet_v2' })
+    const model = await cocoSsd.load({ base: 'mobilenet_v2' })
     devLog('Coco Ssd model loaded')
+
+    predictionWorker = new Worker(path.join(__dirname, '../workers/object-prediction-worker.js'), {
+      workerData: {
+        model,
+      }
+    })
 
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
       workerData: {
@@ -47,10 +51,11 @@ const _init = async () => {
         height: config.camera.height,
         timeout: 0,
         framerate: config.camera.framerate,
+        predictionWorker,
       }
     })
 
-    videoFrameWorker.on('message', async (chunk: Buffer) => {
+    predictionWorker.on('message', (chunk: Buffer, predictions: DetectedObject[]) => {
       const cameraFrame: CameraFrame = {
         mimeType: 'image/jpg',
         buffer: Buffer.from(chunk).toString('base64'),
@@ -62,31 +67,14 @@ const _init = async () => {
           host: hostname,
           friendly_name: config.camera_friendly_name,
         },
+        predictions,
       }
 
-      const imageData = tf.node.decodeImage(chunk)
-      const detection = await model.detect(
-        imageData,
-        config.object_detection_options.max_objects,
-        config.object_detection_options.sensitivity
-      )
+      console.log(predictions)
+    })
 
-      cameraFrame.predictions = detection
-      imageData.dispose()
-
-      // Emit event to clients
-      clients.forEach(socket => {
-        if (socket) {
-          socket.emit(socketEvents.camera.frame, cameraFrame)
-        }
-      })
-
-      // Emit event to servers
-      servers.forEach(socket => {
-        if (socket) {
-          socket.emit(socketEvents.camera.frame, cameraFrame)
-        }
-      })
+    predictionWorker.on('message', (newCameraFrame: CameraFrame) => {
+      console.log(newCameraFrame?.predictions?.length)
     })
 
   } catch (err) {

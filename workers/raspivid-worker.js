@@ -6,7 +6,8 @@ const {
   width,
   height,
   timeout,
-  framerate
+  framerate,
+  predictionWorker,
 } = workerData
 
 const JPEG_START = Buffer.from('\xff\xd8', 'binary')
@@ -44,5 +45,5 @@ const stream = child.stdout.pipe(
 )
 
 stream.on('data', chunk => {
-  parentPort.postMessage(chunk)
+  predictionWorker.postMessage(chunk)
 })
