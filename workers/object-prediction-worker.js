@@ -17,6 +17,7 @@ const predictObjects = async (model, cameraFrame) => {
     imageData.dispose()
     return cameraFrame
   } catch (err) {
+    throw err
     return cameraFrame
   }
 }
