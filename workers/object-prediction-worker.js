@@ -1,7 +1,7 @@
+require('@tensorflow/tfjs-backend-cpu')
 const tf = require('@tensorflow/tfjs-node')
 const { workerData, parentPort } = require('worker_threads')
 const config = require('../config.json')
-require('@tensorflow/tfjs-backend-cpu')
 
 const { model } = workerData
 console.log('Object prediction worker starting')
