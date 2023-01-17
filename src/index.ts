@@ -51,30 +51,30 @@ const _init = async () => {
 
     videoFrameWorker.on('message', async (chunk: Buffer) => {
       console.log('frame')
-      const cameraFrame: CameraFrame = {
-        mimeType: 'image/jpg',
-        buffer: Buffer.from(chunk).toString('base64'),
-        timestamp: new Date().getTime(),
-        camera: {
-          width: config.camera.width,
-          height: config.camera.height,
-          fps: config.camera.framerate,
-          host: hostname,
-          friendly_name: config.camera_friendly_name,
-        },
-      }
+      // const cameraFrame: CameraFrame = {
+      //   mimeType: 'image/jpg',
+      //   buffer: Buffer.from(chunk).toString('base64'),
+      //   timestamp: new Date().getTime(),
+      //   camera: {
+      //     width: config.camera.width,
+      //     height: config.camera.height,
+      //     fps: config.camera.framerate,
+      //     host: hostname,
+      //     friendly_name: config.camera_friendly_name,
+      //   },
+      // }
 
-      const imageData = tf.node.decodeImage(chunk)
-      const detection = await model.detect(
-        imageData,
-        config.object_detection_options.max_objects,
-        config.object_detection_options.sensitivity
-      )
+      // const imageData = tf.node.decodeImage(chunk)
+      // const detection = await model.detect(
+      //   imageData,
+      //   config.object_detection_options.max_objects,
+      //   config.object_detection_options.sensitivity
+      // )
 
-      cameraFrame.predictions = detection
-      imageData.dispose()
+      // cameraFrame.predictions = detection
+      // imageData.dispose()
 
-      console.log(cameraFrame?.predictions?.length)
+      // console.log(cameraFrame?.predictions?.length)
     })
 
   } catch (err) {
