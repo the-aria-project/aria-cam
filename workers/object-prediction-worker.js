@@ -7,7 +7,7 @@ console.log('Object prediction worker starting')
 
 const predictObjects = async (model, cameraFrame) => {
   try {
-    const imageData = tf.node.decodeImage(Buffer.from(cameraFrame.buffer))
+    const imageData = tf.node.decodeImage(Buffer.from(cameraFrame.buffer.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64'))
     const detection = await model.detect(
       imageData,
       config.object_detection_options.max_objects,
