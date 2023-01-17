@@ -9,9 +9,8 @@ import '@tensorflow/tfjs-backend-cpu'
 import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import devLog from './lib/devLog'
 import config from '../config.json'
-import { DetectedObject, ObjectDetection } from '@tensorflow-models/coco-ssd'
+import cocoSsd, { DetectedObject } from '@tensorflow-models/coco-ssd'
 
-const cocoSsd = require('@tensorflow-models/coco-ssd')
 // import frameHandler from './lib/frameHandler'
 
 const hostname = os.hostname()
