@@ -36,7 +36,8 @@ let predictionWorker: Worker
 
 const _init = async () => {
   try {
-    const model = await cocoSsd.load({ base: 'mobilenet_v2' })
+    devLog('Loading Coco Ssd models...')
+    const model = await cocoSsd.load({ base: 'lite_mobilenet_v2' })
     devLog('Coco Ssd model loaded')
 
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
@@ -49,6 +50,7 @@ const _init = async () => {
     })
 
     videoFrameWorker.on('message', async (chunk: Buffer) => {
+      console.log('frame')
       const cameraFrame: CameraFrame = {
         mimeType: 'image/jpg',
         buffer: Buffer.from(chunk).toString('base64'),

@@ -21,7 +21,7 @@ const predictObjects = async (model, cameraFrame, chunk) => {
   }
 }
 
-cocoSsd.load({ base: 'mobilenet_v2' })
+cocoSsd.load({ base: 'lite_mobilenet_v2' })
   .then(model => {
     console.log('Model loaded')
     parentPort.on('message', async ({
