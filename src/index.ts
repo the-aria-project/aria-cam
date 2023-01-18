@@ -38,15 +38,15 @@ let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/rasp
 
 const runDetectionJob = (chunk: Buffer) => {
   isReadyForPrediction = false
-  videoStreamWorker.postMessage(Buffer.from(chunk).toString('base64'))
+  detectionWorker.postMessage(Buffer.from(chunk).toString('base64'))
 }
 
-videoStreamWorker.on('message', (
-  data: 'model-ready' | {
-    time: number,
-    predictions: DetectedObject[]
-  }
-) => {
+type VideoStreamWorkerData = 'model-ready' | {
+  time: number,
+  predictions: DetectedObject[]
+}
+
+detectionWorker.on('message', (data: VideoStreamWorkerData) => {
   if (data === 'model-ready') {
     isReadyForPrediction = true
   } else {
