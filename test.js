@@ -5,7 +5,7 @@ let worker
 
 let lastDetectionWorker = 0
 let readyForPrediction = true
-const predictionInterval = 2000
+const predictionInterval = 500
 let predictionTimer = setInterval(() => {
   readyForPrediction = true
 }, predictionInterval)

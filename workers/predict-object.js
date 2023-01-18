@@ -14,6 +14,7 @@ const predict = (buffer) => new Promise((resolve, reject) => {
     3,
     0.5
   ).then(predictions => {
+    imageData.dispose()
     resolve(predictions)
   })
 })
