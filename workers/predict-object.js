@@ -4,7 +4,7 @@ const { parentPort } = require("worker_threads")
 
 let model = null
 
-cocoSsd.load().then(m => { model = m })
+cocoSsd.load({ base: 'lite_mobilenet_v2' }).then(m => { model = m })
 
 parentPort.on('message', (buffer) => {
   if (model) {
