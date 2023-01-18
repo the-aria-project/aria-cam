@@ -1,4 +1,3 @@
-const tf = require('@tensorflow/tfjs-node')
 const cocoSsd = require('@tensorflow-models/coco-ssd')
 const path = require("path");
 const { Worker } = require("worker_threads");
@@ -34,9 +33,8 @@ const detectObjects = (buffer) => new Promise((resolve, reject) => {
   console.log('Making prediction')
   const detectionWorker = new Worker(path.join(__dirname, './workers/predict-object.js'), {
     workerData: {
-      tf,
       model,
-      buffer,
+      buffer: Buffer.from(buffer).toString('base64'),
     }
   })
 
