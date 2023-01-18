@@ -40,6 +40,7 @@ const runDetectionJob = (chunk: Buffer) => {
   console.log('Running detection job')
   isReadyForPrediction = false
   detectionWorker.postMessage(Buffer.from(chunk).toString('base64'))
+  console.log('Done')
 }
 
 type VideoStreamWorkerData = 'model-ready' | {
