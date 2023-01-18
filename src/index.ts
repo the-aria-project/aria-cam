@@ -26,7 +26,7 @@ let servers: ClientSocket[] = []
 let isReadyForPrediction = false
 
 // Workers
-let detectionWorker: Worker = new Worker(path.join(__dirname, './workers/predict-object.js'))
+let detectionWorker: Worker = new Worker(path.join(__dirname, '../workers/predict-object.js'))
 let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
   workerData: {
     width: config.camera.width,
