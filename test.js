@@ -17,8 +17,8 @@ const _main = async () => {
   const a = new Date().getTime()
   worker = new Worker(path.join(__dirname, './workers/raspivid-worker.js'), {
     workerData: {
-      width: 1280,
-      height: 720,
+      width: 640,
+      height: 480,
       timeout: 0,
       framerate: 1
     }
