@@ -46,7 +46,7 @@ const _init = async () => {
 
     predictionTimer = setInterval(async () => {
       isReadyForPrediction = true
-    }, 2000)
+    }, 5000)
 
     videoFrameWorker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
       workerData: {
