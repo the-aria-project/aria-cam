@@ -16,7 +16,7 @@ const predict = (buffer) => new Promise((resolve, reject) => {
   model.detect(
     imageData,
     3,
-    0.5
+    0.3
   ).then(predictions => {
     imageData.dispose()
     const e = new Date().getTime()
