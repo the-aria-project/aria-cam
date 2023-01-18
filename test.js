@@ -30,7 +30,6 @@ const _main = async () => {
 }
 
 const makePrediction = (chunk) => {
-  console.log(`Making prediction on thread ${lastDetectionWorker}`)
   readyForPrediction = false
   if (lastDetectionWorker === 0) {
     lastDetectionWorker = 1
