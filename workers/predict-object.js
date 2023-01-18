@@ -3,6 +3,7 @@ const cocoSsd = require('@tensorflow-models/coco-ssd')
 const { parentPort } = require("worker_threads")
 
 let model = null
+let isMakingPrediction = false
 
 cocoSsd.load({ base: 'lite_mobilenet_v2' }).then(m => { model = m })
 
@@ -19,8 +20,12 @@ const predict = (buffer) => new Promise((resolve, reject) => {
 
 parentPort.on('message', (buffer) => {
   if (model) {
-    predict(buffer).then(predictions => {
-      parentPort.postMessage(predictions)
-    })
+    if (!isMakingPrediction) {
+      isMakingPrediction = true
+      predict(buffer).then(predictions => {
+        parentPort.postMessage(predictions)
+        isMakingPrediction = false
+      })
+    }
   }
 })
