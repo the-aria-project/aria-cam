@@ -23,7 +23,7 @@ const _main = async () => {
       width: 640,
       height: 480,
       timeout: 0,
-      framerate: 1
+      framerate: 20
     }
   })
   const b = new Date().getTime()
