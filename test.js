@@ -6,6 +6,9 @@ const { Worker } = require("worker_threads");
 let model
 let worker
 
+let readyForPrediction = true
+const predictionInterval = 1000
+
 const _main = async () => {
   console.log('Starting')
   console.log('Loading model')
@@ -29,21 +32,31 @@ const _main = async () => {
 
 _main().then(() => {
   worker.on('message', async chunk => {
+
+    if (readyForPrediction) {
+      readyForPrediction = false
+      setTimeout(() => {
+        readyForPrediction = true
+      }, predictionInterval)
+
+      console.log('Making prediction')
+      const s = new Date().getTime()
+      // const buffer = Buffer.from(chunk.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64')
+      const iS = new Date().getTime()
+      const imageData = tf.node.decodeImage(chunk)
+      const iE = new Date().getTime()
+      console.log(`Image Data took ${iE - iS}ms`)
+      console.log(imageData)
+      const detection = await model.detect(
+        imageData,
+        3,
+        0.5
+      )
+      const e = new Date().getTime()
+      console.log(`${detection.length} predictions made in ${e - s}ms`)
+    }
+    
     console.log('Frame captured')
-    const s = new Date().getTime()
-    // const buffer = Buffer.from(chunk.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64')
-    const iS = new Date().getTime()
-    const imageData = tf.node.decodeImage(chunk)
-    const iE = new Date().getTime()
-    console.log(`Image Data took ${iE - iS}ms`)
-    console.log(imageData)
-    const detection = await model.detect(
-      imageData,
-      3,
-      0.5
-    )
-    const e = new Date().getTime()
-    console.log(`${detection.length} predictions made in ${e - s}ms`)
   })
 })
 
