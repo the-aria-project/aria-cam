@@ -29,11 +29,14 @@ _main().then(() => {
     console.log('Frame captured')
     const s = new Date().getTime()
     // const buffer = Buffer.from(chunk.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64')
+    const iS = new Date().getTime()
     const imageData = tf.node.decodeImage(chunk)
+    const iE = new Date().getTime()
+    console.log(`Image Data took ${iE - iS}ms`)
     console.log(imageData)
     const detection = await model.detect(
       imageData,
-      1,
+      3,
       0.5
     )
     const e = new Date().getTime()
