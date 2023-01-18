@@ -37,6 +37,7 @@ let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/rasp
 })
 
 const runDetectionJob = (chunk: Buffer) => {
+  console.log('Running detection job')
   isReadyForPrediction = false
   detectionWorker.postMessage(Buffer.from(chunk).toString('base64'))
 }
