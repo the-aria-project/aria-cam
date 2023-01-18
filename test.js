@@ -34,7 +34,7 @@ _main().then(() => {
       readyForPrediction = true
     } else {
       readyForPrediction = true
-      console.log(predictions)
+      console.log(data)
     }
   })
   worker.on('message', chunk => {
