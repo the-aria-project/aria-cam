@@ -1,4 +1,4 @@
-const tf = require('@tensorflow/tfjs-node')
+require('@tensorflow/tfjs-node')
 const cocoSsd = require('@tensorflow-models/coco-ssd')
 const path = require("path");
 const { Worker } = require("worker_threads");
@@ -8,6 +8,8 @@ let worker
 
 let readyForPrediction = true
 const predictionInterval = 1000
+
+const detectionWorker = new Worker(path.join(__dirname, './workers/predict-object.js'))
 
 const _main = async () => {
   console.log('Starting')
@@ -30,39 +32,18 @@ const _main = async () => {
   console.log(`Took ${b - a}ms to create thread`)
 }
 
-const detectObjects = (buffer) => new Promise((resolve, reject) => {
-  console.log('Making prediction')
-  const detectionWorker = new Worker(path.join(__dirname, './workers/predict-object.js'), {
-    workerData: {
-      model,
-      buffer: Buffer.from(buffer).toString('base64'),
-    }
-  })
-
-  detectionWorker.on('message', (predictions) => {
-    resolve(predictions)
-  })
-
-  detectionWorker.on('error', err => {
-    reject(err)
-  })
-})
-
 _main().then(() => {
+  detectionWorker.on('message', (predictions) => {
+    console.log(predictions.length)
+  })
   worker.on('message', chunk => {
-
     if (readyForPrediction) {
       readyForPrediction = false
       setTimeout(() => {
         readyForPrediction = true
       }, predictionInterval)
-
-      detectObjects(chunk)
-        .then(predictions => {
-          console.log(predictions.length)
-        })
+      detectionWorker.postMessage(Buffer.from(chunk).toString('base64'))
     }
-    
     console.log('Frame captured')
   })
 })

@@ -1,16 +1,20 @@
 const tf = require('@tensorflow/tfjs-node')
-const { workerData, parentPort } = require("worker_threads")
+const cocoSsd = require('@tensorflow-models/coco-ssd')
+const { parentPort } = require("worker_threads")
 
-const {
-  model,
-  buffer
-} = workerData
+let model = null
 
-const imageData = tf.node.decodeImage(Buffer.from(buffer.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64'))
-model.detect(
-  imageData,
-  3,
-  0.5
-).then(predictions => {
-  parentPort.postMessage(predictions)
+cocoSsd.load().then(m => { model = m })
+
+parentPort.on('message', (buffer) => {
+  if (model) {
+    const imageData = tf.node.decodeImage(Buffer.from(buffer.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64'))
+    model.detect(
+      imageData,
+      3,
+      0.5
+    ).then(predictions => {
+      parentPort.postMessage(predictions)
+    })
+  }
 })
