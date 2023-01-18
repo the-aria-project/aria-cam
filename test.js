@@ -14,6 +14,7 @@ const _main = async () => {
   const e = new Date().getTime()
   console.log(`Loaded model in ${e - s}ms`)
 
+  const a = new Date().getTime()
   worker = new Worker(path.join(__dirname, './workers/raspivid-worker.js'), {
     workerData: {
       width: 1280,
@@ -22,6 +23,8 @@ const _main = async () => {
       framerate: 1
     }
   })
+  const b = new Date().getTime()
+  console.log(`Took ${b - a}ms to create thread`)
 }
 
 _main().then(() => {
