@@ -15,7 +15,7 @@ const predict = (buffer) => new Promise((resolve, reject) => {
   const imageData = tf.node.decodeImage(Buffer.from(buffer.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64'))
   model.detect(
     imageData,
-    3,
+    10,
     0.3
   ).then(predictions => {
     imageData.dispose()
