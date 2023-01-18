@@ -3,10 +3,15 @@ const { Worker } = require("worker_threads");
 
 let worker
 
+let lastDetectionWorker = 0
 let readyForPrediction = true
-const predictionInterval = 3000
+const predictionInterval = 2000
+let predictionTimer = setInterval(() => {
+  readyForPrediction = true
+}, predictionInterval)
 
-const detectionWorker = new Worker(path.join(__dirname, './workers/predict-object.js'))
+const detectionWorker0 = new Worker(path.join(__dirname, './workers/predict-object.js'))
+const detectionWorker1 = new Worker(path.join(__dirname, './workers/predict-object.js'))
 
 const _main = async () => {
   console.log('Starting')
@@ -24,17 +29,28 @@ const _main = async () => {
   console.log(`Took ${b - a}ms to create thread`)
 }
 
+const makePrediction = (chunk) => {
+  console.log(`Making prediction on thread ${lastDetectionWorker}`)
+  readyForPrediction = false
+  if (lastDetectionWorker === 0) {
+    lastDetectionWorker = 1
+    detectionWorker1.postMessage(Buffer.from(chunk).toString('base64'))
+  } else {
+    lastDetectionWorker = 0
+    detectionWorker0.postMessage(Buffer.from(chunk).toString('base64'))
+  }
+}
+
 _main().then(() => {
-  detectionWorker.on('message', (predictions) => {
+  detectionWorker0.on('message', (predictions) => {
+    console.log(predictions)
+  })
+  detectionWorker1.on('message', (predictions) => {
     console.log(predictions)
   })
   worker.on('message', chunk => {
     if (readyForPrediction) {
-      readyForPrediction = false
-      setTimeout(() => {
-        readyForPrediction = true
-      }, predictionInterval)
-      detectionWorker.postMessage(Buffer.from(chunk).toString('base64'))
+      makePrediction(chunk)
     }
   })
 })
