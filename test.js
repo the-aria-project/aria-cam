@@ -1,3 +1,4 @@
+const tf = require('@tensorflow/tfjs-node')
 const cocoSsd = require('@tensorflow-models/coco-ssd')
 const path = require("path");
 const { Worker } = require("worker_threads");
