@@ -1,9 +1,6 @@
-require('@tensorflow/tfjs-node')
-const cocoSsd = require('@tensorflow-models/coco-ssd')
 const path = require("path");
 const { Worker } = require("worker_threads");
 
-let model
 let worker
 
 let readyForPrediction = true
@@ -13,11 +10,6 @@ const detectionWorker = new Worker(path.join(__dirname, './workers/predict-objec
 
 const _main = async () => {
   console.log('Starting')
-  console.log('Loading model')
-  const s = new Date().getTime()
-  model = await cocoSsd.load({ base: 'lite_mobilenet_v2' })
-  const e = new Date().getTime()
-  console.log(`Loaded model in ${e - s}ms`)
 
   const a = new Date().getTime()
   worker = new Worker(path.join(__dirname, './workers/raspivid-worker.js'), {
