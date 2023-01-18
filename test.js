@@ -33,8 +33,8 @@ _main().then(() => {
     console.log(imageData)
     const detection = await model.detect(
       imageData,
-      3,
-      0.1
+      1,
+      0.5
     )
     const e = new Date().getTime()
     console.log(`${detection.length} predictions made in ${e - s}ms`)
