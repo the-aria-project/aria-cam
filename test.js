@@ -1,5 +1,4 @@
 const tf = require('@tensorflow/tfjs-node')
-require('@tensorflow/tfjs-backend-cpu')
 const cocoSsd = require('@tensorflow-models/coco-ssd')
 const path = require("path");
 const { Worker } = require("worker_threads");
@@ -35,7 +34,7 @@ _main().then(() => {
     const detection = await model.detect(
       imageData,
       3,
-      0.9
+      0.1
     )
     const e = new Date().getTime()
     console.log(`${detection.length} predictions made in ${e - s}ms`)
