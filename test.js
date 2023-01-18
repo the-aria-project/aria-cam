@@ -26,7 +26,7 @@ const _main = async () => {
 
 _main().then(() => {
   detectionWorker.on('message', (predictions) => {
-    console.log(predictions.length)
+    console.log(predictions)
   })
   worker.on('message', chunk => {
     if (readyForPrediction) {
