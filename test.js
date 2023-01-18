@@ -25,7 +25,7 @@ const _main = async () => {
 
 const makePrediction = (chunk) => {
   readyForPrediction = false
-  detectionWorker1.postMessage(Buffer.from(chunk).toString('base64'))
+  detectionWorker.postMessage(Buffer.from(chunk).toString('base64'))
 }
 
 _main().then(() => {
