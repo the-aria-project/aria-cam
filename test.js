@@ -36,7 +36,6 @@ _main().then(() => {
       }, predictionInterval)
       detectionWorker.postMessage(Buffer.from(chunk).toString('base64'))
     }
-    console.log('Frame captured')
   })
 })
 
