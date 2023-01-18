@@ -4,7 +4,7 @@ const { Worker } = require("worker_threads");
 let worker
 
 let readyForPrediction = true
-const predictionInterval = 2000
+const predictionInterval = 2500
 
 const detectionWorker = new Worker(path.join(__dirname, './workers/predict-object.js'))
 
