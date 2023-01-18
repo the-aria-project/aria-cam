@@ -3,7 +3,7 @@ const { Worker } = require("worker_threads");
 
 let worker
 
-let readyForPrediction = true
+let readyForPrediction = false
 
 const detectionWorker = new Worker(path.join(__dirname, './workers/predict-object.js'))
 
@@ -29,9 +29,13 @@ const makePrediction = (chunk) => {
 }
 
 _main().then(() => {
-  detectionWorker.on('message', (predictions) => {
-    readyForPrediction = true
-    console.log(predictions)
+  detectionWorker.on('message', (data) => {
+    if (data === 'model-ready') {
+      readyForPrediction = true
+    } else {
+      readyForPrediction = true
+      console.log(predictions)
+    }
   })
   worker.on('message', chunk => {
     if (readyForPrediction) {
