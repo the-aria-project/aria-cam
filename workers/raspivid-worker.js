@@ -31,7 +31,7 @@ try {
     }
   })
 
-  args.push(`-o ${path.join(__dirname, '../recordings/test.mp4')}`)
+  args.push(`-o "${path.join(__dirname, '../recordings/test.mp4')}"`)
   args.push('-')
 
   const child = childProcess.spawn('raspivid', args, {
