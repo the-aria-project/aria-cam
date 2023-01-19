@@ -2,7 +2,7 @@
   "camera_friendly_name": "ARIA Camera",
   "server_port": 3000,
   "record_locally": true,
-  "use_object_detection": true,
+  "use_object_detection": false,
   "object_detection_options": {
     "max_objects": 3,
     "sensitivity": 0.5

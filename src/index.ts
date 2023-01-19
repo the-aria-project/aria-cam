@@ -26,7 +26,7 @@ let servers: ClientSocket[] = []
 let isReadyForPrediction = false
 
 // Workers
-let detectionWorker: Worker = new Worker(path.join(__dirname, '../workers/predict-object.js'))
+let detectionWorker: Worker
 let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
   workerData: {
     width: config.camera.width,
@@ -36,26 +36,30 @@ let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/rasp
   }
 })
 
+type VideoStreamWorkerData = 'model-ready' | {
+  time: number,
+  predictions: DetectedObject[]
+}
+
+if (config.use_object_detection) {
+  detectionWorker = new Worker(path.join(__dirname, '../workers/predict-object.js'))
+
+  detectionWorker.on('message', (data: VideoStreamWorkerData) => {
+    if (data === 'model-ready') {
+      isReadyForPrediction = true
+    } else {
+      isReadyForPrediction = true
+      console.log(data)
+    }
+  })
+}
+
 const runDetectionJob = (chunk: Buffer) => {
   console.log('Running detection job')
   isReadyForPrediction = false
   detectionWorker.postMessage(Buffer.from(chunk).toString('base64'))
   console.log('Done')
 }
-
-type VideoStreamWorkerData = 'model-ready' | {
-  time: number,
-  predictions: DetectedObject[]
-}
-
-detectionWorker.on('message', (data: VideoStreamWorkerData) => {
-  if (data === 'model-ready') {
-    isReadyForPrediction = true
-  } else {
-    isReadyForPrediction = true
-    console.log(data)
-  }
-})
 
 videoStreamWorker.on('message', async (chunk: Buffer) => {
   const cameraFrame: CameraFrame = {
@@ -85,7 +89,7 @@ videoStreamWorker.on('message', async (chunk: Buffer) => {
     }
   })
 
-  if (isReadyForPrediction) {
+  if (isReadyForPrediction && config.use_object_detection) {
     runDetectionJob(chunk)
   }
 
