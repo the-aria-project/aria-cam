@@ -1,4 +1,5 @@
 import os from 'os'
+import fs from 'fs'
 import path from 'path'
 import express, { Request, Response } from 'express'
 import socketIO, { Socket as ServerSocket } from 'socket.io'
@@ -41,9 +42,19 @@ const broadcastToHub = (cameraFrame: CameraFrame) => {
 
 }
 
-const sendVideoToStorage = () => {
+const sendVideoToStorage = async () => {
+  readyToProcessVideo = false
   console.log(`Processing ${currentStream.length} chunks`)
+  const stream = [ ...currentStream ]
   currentStream = []
+
+  const videoBuffer = Buffer.from(
+    stream
+    .map((b: Buffer) => Buffer.from(b).toString('base64'))
+    .join('')
+    .replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64'
+  )
+  fs.promises.writeFile(path.join(__dirname, '../recordings/test.mp4'), videoBuffer)
 }
 
 const onFrame = (chunk: Buffer) => {
@@ -72,7 +83,6 @@ const onFrame = (chunk: Buffer) => {
     currentStream.push(chunk)
 
     if (readyToProcessVideo) {
-      readyToProcessVideo = false
       sendVideoToStorage()
     }
   }
