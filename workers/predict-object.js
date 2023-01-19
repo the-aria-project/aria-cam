@@ -11,6 +11,7 @@ cocoSsd.load({ base: 'lite_mobilenet_v2' }).then(m => {
 })
 
 const predict = (buffer) => new Promise((resolve, reject) => {
+  tf.engine().startScope()
   const s = new Date().getTime()
   const imageData = tf.node.decodeImage(Buffer.from(buffer.replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64'))
   model.detect(
@@ -20,6 +21,7 @@ const predict = (buffer) => new Promise((resolve, reject) => {
   ).then(predictions => {
     imageData.dispose()
     const e = new Date().getTime()
+    tf.engine().endScope()
     resolve({
       time: e - s,
       predictions,
