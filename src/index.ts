@@ -10,9 +10,6 @@ import { socketEvents } from 'aria-lib'
 import devLog from './lib/devLog'
 import config from '../config.json'
 
-import { DetectedObject } from '@tensorflow-models/coco-ssd'
-// import frameHandler from './lib/frameHandler'
-
 const hostname = os.hostname()
 
 // Objects
@@ -21,12 +18,11 @@ const server = new http.Server(app)
 const io = new socketIO.Server(server)
 
 // State
+let readyToProcessVideo = false
 let clients: ServerSocket[] = []
-let servers: ClientSocket[] = []
-let isReadyForPrediction = false
+const currentStream: Buffer[] = []
 
 // Workers
-let detectionWorker: Worker
 let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
   workerData: {
     width: config.camera.width,
@@ -36,32 +32,20 @@ let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/rasp
   }
 })
 
-type VideoStreamWorkerData = 'model-ready' | {
-  time: number,
-  predictions: DetectedObject[]
+// Methods
+const sendImageToBrain = (cameraFrame: CameraFrame) => {
+  
 }
 
-if (config.use_object_detection) {
-  detectionWorker = new Worker(path.join(__dirname, '../workers/predict-object.js'))
+const broadcastToHub = (cameraFrame: CameraFrame) => {
 
-  detectionWorker.on('message', (data: VideoStreamWorkerData) => {
-    if (data === 'model-ready') {
-      isReadyForPrediction = true
-    } else {
-      isReadyForPrediction = true
-      console.log(data)
-    }
-  })
 }
 
-const runDetectionJob = (chunk: Buffer) => {
-  console.log('Running detection job')
-  isReadyForPrediction = false
-  detectionWorker.postMessage(Buffer.from(chunk).toString('base64'))
-  console.log('Done')
+const sendVideoToStorage = (chunks: Buffer[]) => {
+  console.log('Processing Video')
 }
 
-videoStreamWorker.on('message', async (chunk: Buffer) => {
+const onFrame = (chunk: Buffer) => {
   const cameraFrame: CameraFrame = {
     mimeType: 'image/jpg',
     buffer: Buffer.from(chunk).toString('base64'),
@@ -75,25 +59,32 @@ videoStreamWorker.on('message', async (chunk: Buffer) => {
     },
   }
 
-
-  clients.forEach(socket => {
-    if (socket) {
-      socket.emit(socketEvents.camera.frame, cameraFrame)
-    }
-  })
-
-  // Emit event to servers
-  servers.forEach(socket => {
-    if (socket) {
-      socket.emit(socketEvents.camera.frame, cameraFrame)
-    }
-  })
-
-  if (isReadyForPrediction && config.use_object_detection) {
-    runDetectionJob(chunk)
+  if (config.use_live_view) {
+    clients.forEach(socket => {
+      if (socket) {
+        socket.emit(socketEvents.camera.frame, cameraFrame)
+      }
+    })
   }
 
-})
+  if (config.aria_services.use_video_storage) {
+    currentStream.push(chunk)
+
+    if (readyToProcessVideo) {
+      readyToProcessVideo = false
+      sendVideoToStorage(currentStream)
+    }
+  }
+}
+
+// Application
+if (config.aria_services.use_video_storage) {
+  setInterval(() => {
+    readyToProcessVideo = true
+  }, 60000)
+}
+
+videoStreamWorker.on('message', onFrame)
 
 // Clients
 io.on('connection', (socket: ServerSocket) => {
@@ -106,43 +97,26 @@ io.on('connection', (socket: ServerSocket) => {
   })
 })
 
-// Servers
-config.frame_destinations.forEach((dest: ConfigDestination) => {
-  const socket = socketIOClient(
-    `${dest.ssl ? 'https' : 'http'}://${dest.host}:${dest.port}`
-  )
-
-  socket.on('connect', () => {
-    devLog(`[${socket.id}] Connected to ${dest.host}`)
-    servers.push(socket)
-  })
-
-  socket.on('disconnect', () => {
-    devLog(`[${socket.id}] Disconnected from ${dest.host}`)
-    servers = servers.filter(s => s.id !== socket.id)
-  })
-})
-
 // Endpoints
-app.get('/live', (req: Request, res: Response) => {
-  res.sendFile(path.resolve(__dirname, 'live-view.html'))
-})
+if (config.use_live_view) {
+  app.get('/live', (req: Request, res: Response) => {
+    res.sendFile(path.resolve(__dirname, 'live-view.html'))
+  })
+}
 
 // Start server
 server.listen(config.server_port, () => {
   devLog(`Camera server running on port ${config.server_port}`)
-  devLog(
-    `View your camera live at http://${os.hostname()}${[8080, 80].includes(config.server_port)
-      ? '/live'
-      : `:${config.server_port}/live`
-    }`
-  )
+  if (config.use_live_view) {
+    devLog(
+      `View your camera live at http://${os.hostname()}${[8080, 80].includes(config.server_port)
+        ? '/live'
+        : `:${config.server_port}/live`
+      }`
+    )
+  }
 
   devLog(
     `Camera Config: ${config.camera.width}x${config.camera.height}@${config.camera.framerate}fps`
   )
-  devLog(`\n__Configured detinations__`)
-  config.frame_destinations.forEach((dest: ConfigDestination) => {
-    devLog(`${dest.ssl ? 'https' : 'http'}://${dest.host}:${dest.port}`)
-  })
 })

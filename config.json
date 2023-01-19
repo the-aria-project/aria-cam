@@ -1,23 +1,19 @@
 {
   "camera_friendly_name": "ARIA Camera",
   "server_port": 3000,
-  "record_locally": true,
-  "use_object_detection": false,
-  "object_detection_options": {
-    "max_objects": 3,
-    "sensitivity": 0.5
-  },
-  "frame_destinations": [
-    {
-      "host": "",
-      "port": 3000,
-      "ssl": false
+  "use_live_view": true,
+  "aria_services": {
+    "use_object_detection": true,
+    "use_video_storage": true,
+    "destinations": {
+      "aria_cam_brain": "test.local",
+      "aria_hub": "test.local",
+      "aria_storage": "test.local"
     }
-  ],
+  },
   "camera": {
     "width": 1280,
     "height": 720,
-    "framerate": 20,
-    "reset_interval": 30000
+    "framerate": 20
   }
 }
