@@ -20,7 +20,7 @@ const io = new socketIO.Server(server)
 // State
 let readyToProcessVideo = false
 let clients: ServerSocket[] = []
-const currentStream: Buffer[] = []
+let currentStream: Buffer[] = []
 
 // Workers
 let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
@@ -41,8 +41,9 @@ const broadcastToHub = (cameraFrame: CameraFrame) => {
 
 }
 
-const sendVideoToStorage = (chunks: Buffer[]) => {
-  console.log('Processing Video')
+const sendVideoToStorage = () => {
+  console.log(`Processing ${currentStream.length} chunks`)
+  currentStream = []
 }
 
 const onFrame = (chunk: Buffer) => {
@@ -72,7 +73,7 @@ const onFrame = (chunk: Buffer) => {
 
     if (readyToProcessVideo) {
       readyToProcessVideo = false
-      sendVideoToStorage(currentStream)
+      sendVideoToStorage()
     }
   }
 }
@@ -81,7 +82,7 @@ const onFrame = (chunk: Buffer) => {
 if (config.aria_services.use_video_storage) {
   setInterval(() => {
     readyToProcessVideo = true
-  }, 60000)
+  }, 10000)
 }
 
 videoStreamWorker.on('message', onFrame)
