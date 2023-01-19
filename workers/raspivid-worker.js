@@ -1,6 +1,7 @@
 const SplitFrames = require('split-frames')
 const childProcess = require('child_process')
 const { workerData, parentPort } = require('worker_threads')
+const path = require('path')
 
 try {
   const {
@@ -30,7 +31,7 @@ try {
     }
   })
 
-  args.push('-o')
+  args.push(`-o ${path.join(__dirname, '../recordings/test.mp4')}`)
   args.push('-')
 
   const child = childProcess.spawn('raspivid', args, {
