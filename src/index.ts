@@ -81,8 +81,7 @@ const onFrame = (chunk: Buffer) => {
   }
 
   if (config.aria_services.use_video_storage) {
-    currentStream.push(chunk)
-
+    
     if (readyToProcessVideo) {
       sendVideoToStorage()
     }
