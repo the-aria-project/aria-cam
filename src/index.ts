@@ -121,6 +121,11 @@ if (config.use_live_view) {
   })
 }
 
+app.get('/download', (req: Request, res: Response) => {
+  const file = path.join(__dirname, '../recordings/test.mp4')
+  res.download(file)
+})
+
 // Start server
 server.listen(config.server_port, () => {
   devLog(`Camera server running on port ${config.server_port}`)
