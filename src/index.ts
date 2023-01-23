@@ -11,6 +11,8 @@ import { socketEvents } from 'aria-lib'
 import devLog from './lib/devLog'
 import config from '../config.json'
 
+const isDev = process.env.NODE_ENV === 'development'
+
 const hostname = os.hostname()
 
 // Objects
@@ -90,6 +92,10 @@ const onFrame = (chunk: Buffer) => {
 
 // Application
 if (config.aria_services.use_video_storage) {
+  if (!fs.existsSync(path.join(__dirname, '../recordings'))) {
+    fs.mkdirSync(path.join(__dirname, '../recordings'))
+  }
+  
   setInterval(() => {
     readyToProcessVideo = true
   }, 10000)
