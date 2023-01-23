@@ -37,7 +37,7 @@ let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/rasp
 
 // Methods
 const sendImageToBrain = (cameraFrame: CameraFrame) => {
-  
+
 }
 
 const broadcastToHub = (cameraFrame: CameraFrame) => {
@@ -47,14 +47,13 @@ const broadcastToHub = (cameraFrame: CameraFrame) => {
 const sendVideoToStorage = async () => {
   readyToProcessVideo = false
   console.log(`Processing ${currentStream.length} chunks`)
-  const stream = [ ...currentStream ]
+  const stream = [...currentStream]
   currentStream = []
 
   const videoBuffer = Buffer.from(
     stream
-    .map((b: Buffer) => Buffer.from(b).toString('base64'))
-    .join('')
-    .replace(/^data:image\/(png|jpeg);base64,/, ''), 'base64'
+      .map((b: Buffer) => Buffer.from(b).toString('base64').replace(/^data:image\/(png|jpeg);base64,/, ''))
+      .join(''), 'base64'
   )
   fs.promises.writeFile(path.join(__dirname, '../recordings/test.mp4'), videoBuffer)
 }
@@ -95,7 +94,7 @@ if (config.aria_services.use_video_storage) {
   if (!fs.existsSync(path.join(__dirname, '../recordings'))) {
     fs.mkdirSync(path.join(__dirname, '../recordings'))
   }
-  
+
   setInterval(() => {
     readyToProcessVideo = true
   }, 10000)
