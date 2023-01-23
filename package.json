@@ -1,6 +1,6 @@
 {
   "name": "aria-cam",
-  "version": "1.0.0",
+  "version": "0.0.3",
   "description": "Wifi Camera for ARIA ecosystem",
   "main": "dist/src/index.js",
   "scripts": {
