@@ -46,12 +46,12 @@ class Camera {
     this.recordingLength = 10000
     this.recordedChunks = []
 
-    this.onWorkerFrame.bind(this)
-    this.stopWorker.bind(this)
-    this.startWorker.bind(this)
-    this.start.bind(this)
-    this.stop.bind(this)
-    this.onCameraFrame.bind(this)
+    this.onWorkerFrame = this.onWorkerFrame.bind(this)
+    this.stopWorker = this.stopWorker.bind(this)
+    this.startWorker = this.startWorker.bind(this)
+    this.start = this.start.bind(this)
+    this.stop = this.stop.bind(this)
+    this.onCameraFrame = this.onCameraFrame.bind(this)
 
     console.log(this.config)
   }
