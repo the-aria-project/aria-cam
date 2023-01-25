@@ -69,7 +69,7 @@ app.get('/download', (req: Request, res: Response) => {
 })
 
 app.get('/video', (req: Request, res: Response) => {
-  const file = path.join(__dirname, '../recordings/test_video.h264')
+  const file = path.join(__dirname, '../recordings/test.mjpg')
   res.sendFile(file)
 })
 

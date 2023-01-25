@@ -34,14 +34,14 @@ try {
   args.push('-o')
   args.push('-')
 
-  const child = childProcess.spawn(`raspivid --nopreview --width 1280 --height 720 --timeout 0 --framerate 20 -o -${path.join(__dirname, '../recordings/test_video.h264')}`, {
-    stdio: ['ignore', 'pipe', 'inherit'],
-    shell: true,
-  })
+  // For Testing
+  args.pop()
+  args.push(`${path.join(__dirname, '../recordings/test.mjpg')}`)
+  console.log(args)
 
-  // const child = childProcess.spawn('raspivid', args, {
-  //   stdio: ['ignore', 'pipe', 'inherit'],
-  // })
+  const child = childProcess.spawn('raspivid', args, {
+    stdio: ['ignore', 'pipe', 'inherit'],
+  })
 
   // const stream = child.stdout.pipe(
   //   new SplitFrames({
