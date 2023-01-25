@@ -83,40 +83,41 @@ class Camera {
     console.log('Starting promises')
     chunks.forEach((chunk, index) => {
       const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
-      files.push(filePath)
-      const promise = new Promise((resolve, reject) => {
-        fs.promises.writeFile(filePath, chunk)
-          .then(() => {
-            console.log(`Wrote ${filePath}`)
-            resolve(filePath)
-          })
-          .catch(err => {
-            console.log(err)
-            reject(err)
-          })
-      })
-      promises.push(promise)
+      console.log(filePath)
+      // files.push(filePath)
+      // const promise = new Promise((resolve, reject) => {
+      //   fs.promises.writeFile(filePath, chunk)
+      //     .then(() => {
+      //       console.log(`Wrote ${filePath}`)
+      //       resolve(filePath)
+      //     })
+      //     .catch(err => {
+      //       console.log(err)
+      //       reject(err)
+      //     })
+      // })
+      // promises.push(promise)
     })
-    await Promise.all(promises)
-    console.log('Files written, starting ffmpeg')
+    // await Promise.all(promises)
+    // console.log('Files written, starting ffmpeg')
     const inputImageValue = path.join(storageDir, `%0${String(chunks).length}d.jpeg`)
     console.log(inputImageValue)
-    const proc = spawn('ffmpeg', [
-      '-r', '20',
-      '-s', '1280x720',
-      '-i', inputImageValue,
-      '-vcodec', 'libx264',
-      '-crf', '25',
-      'test.mp4'
-    ])
+    // const proc = spawn('ffmpeg', [
+    //   '-r', '20',
+    //   '-s', '1280x720',
+    //   '-i', inputImageValue,
+    //   '-vcodec', 'libx264',
+    //   '-crf', '25',
+    //   'test.mp4'
+    // ])
 
-    proc.on('close', () => {
-      console.log('Completed, cleaning up...')
-      fs.promises.rm(storageDir, { recursive: true, force: true })
-        .then(() => {
-          console.log('Done cleaning jpegs')
-        })
-    })
+    // proc.on('close', () => {
+    //   console.log('Completed, cleaning up...')
+    //   fs.promises.rm(storageDir, { recursive: true, force: true })
+    //     .then(() => {
+    //       console.log('Done cleaning jpegs')
+    //     })
+    // })
   }
 
   onWorkerFrame(chunk: Buffer) {
