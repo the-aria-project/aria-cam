@@ -52,8 +52,6 @@ class Camera {
     this.start = this.start.bind(this)
     this.stop = this.stop.bind(this)
     this.onCameraFrame = this.onCameraFrame.bind(this)
-
-    console.log(this.config)
   }
 
   onWorkerFrame(chunk: Buffer) {
