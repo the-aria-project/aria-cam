@@ -34,7 +34,7 @@ try {
   args.push('-o')
   args.push('-')
 
-  const child = childProcess.spawn(`raspivid --nopreview --width 1280 --height 720 --timeout 0 --framerate 20 -o - | tee ${path.join(__dirname, '../recordings/test_video.h264')} | MP4Box -fps 20 -add ${path.join(__dirname, '../recordings/test_video.h264')} | ${path.join(__dirname, '../recordings/test_video.mp4')}`, {
+  const child = childProcess.spawn(`raspivid --nopreview --width 1280 --height 720 --timeout 0 --framerate 20 -o -${path.join(__dirname, '../recordings/test_video.h264')}`, {
     stdio: ['ignore', 'pipe', 'inherit'],
     shell: true,
   })
@@ -43,16 +43,16 @@ try {
   //   stdio: ['ignore', 'pipe', 'inherit'],
   // })
 
-  const stream = child.stdout.pipe(
-    new SplitFrames({
-      startWith: JPEG_START,
-      endWith: JPEG_END,
-    })
-  )
+  // const stream = child.stdout.pipe(
+  //   new SplitFrames({
+  //     startWith: JPEG_START,
+  //     endWith: JPEG_END,
+  //   })
+  // )
 
-  stream.on('data', chunk => {
-    parentPort.postMessage(chunk)
-  })
+  // stream.on('data', chunk => {
+  //   parentPort.postMessage(chunk)
+  // })
 } catch (err) {
   throw err
 }
