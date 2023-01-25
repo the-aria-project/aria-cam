@@ -1,4 +1,4 @@
 {
   "verbose": false,
-  "ignore": ["node_modules", "README.md", "package.json", "package-lock.json", "recordings", "tmp"]
+  "ignore": ["node_modules/", "README.md", "package.json", "package-lock.json", "recordings/", "tmp/"]
 }
