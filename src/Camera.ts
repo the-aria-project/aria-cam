@@ -9,11 +9,15 @@ const videoshow = require('videoshow')
 
 const hostname = os.hostname()
 
-const digitNumberString: (input: string | number, digits?: number) => string = (input, digits) => {
+const digitNumberString = (input: number | string, digits?: number) => {
+  console.log('Here')
   if (digits === 0 || !digits) {
+    console.log(String(Number(input)))
     return String(Number(input))
   }
 
+  console.log('Over here')
+  console.log(`${'0'.repeat(digits - String(Number(input)).length)}${String(Number(input))}`)
   return `${'0'.repeat(digits - String(Number(input)).length)}${String(Number(input))}`
 }
 
