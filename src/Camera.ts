@@ -57,7 +57,7 @@ class Camera {
   }
 
   async processVideo(chunks: Buffer[]) {
-    console.log('Processing video')
+    console.log(`Processing video from ${chunks.length} chunks`)
     const tmpPath = path.join(__dirname, '../tmp')
     const now = new Date().getTime()
     const videoOptions = {
@@ -75,17 +75,31 @@ class Camera {
     }
 
     if (!fs.existsSync(tmpPath)) {
+      console.log('Creating tmp path')
       await fs.promises.mkdir(path.join(__dirname, '../tmp'))
     }
     
     const promises: Promise<any>[] = []
     const files: string[] = []
+    console.log('Starting promises')
     chunks.forEach((chunk, index) => {
       const filePath = path.join(__dirname, '../tmp', `${now}-${index}.jpg`)
       files.push(filePath)
-      promises.push(fs.promises.writeFile(filePath, chunk))
+      const promise = new Promise((resolve, reject) => {
+        fs.promises.writeFile(filePath, chunk)
+          .then(() => {
+            console.log(`Wrote ${filePath}`)
+            resolve(filePath)
+          })
+          .catch(err => {
+            console.log(err)
+            reject(err)
+          })
+      })
+      promises.push(promise)
     })
     await Promise.all(promises)
+    console.log('Files written, starting video show')
 
     videoshow(files, videoOptions)
       .save(path.join(__dirname, '../recordings/test.mp4'))
