@@ -99,10 +99,12 @@ class Camera {
     })
     await Promise.all(promises)
     console.log('Files written, starting ffmpeg')
+    const inputImageValue = path.join(storageDir, `%0${String(chunks).length}d.jpeg`)
+    console.log(inputImageValue)
     const proc = spawn('ffmpeg', [
       '-r', '20',
       '-s', '1280x720',
-      '-i', `${path.join(storageDir, `%0${String(chunks).length}d.jpeg`)}`,
+      '-i', inputImageValue,
       '-vcodec', 'libx264',
       '-crf', '25',
       'test.mp4'
