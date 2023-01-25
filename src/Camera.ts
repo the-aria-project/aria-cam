@@ -93,7 +93,7 @@ class Camera {
       })
       .on('end', (output: any) => {
         console.log('Video created in: ', output)
-        files.forEach(file => fs.rm(file))
+        files.forEach(file => fs.rm(file, () => {}))
       })
   }
 
