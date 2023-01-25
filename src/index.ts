@@ -73,8 +73,8 @@ app.get('/video', (req: Request, res: Response) => {
   res.sendFile(file)
 })
 
-app.use(express.static('../recordings'))
-app.use(express.static('../tmp'))
+app.use('/recordings', express.static('../recordings'))
+app.use('/tmp', express.static('../tmp'))
 
 // Start server
 server.listen(config.server_port, () => {
