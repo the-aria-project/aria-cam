@@ -58,6 +58,7 @@ class Camera {
 
   async processVideo(chunks: Buffer[]) {
     console.log('Processing video')
+    const now = new Date().getTime()
     const videoOptions = {
       fps: 25,
       loop: 0,
@@ -72,7 +73,17 @@ class Camera {
       pixelFormat: 'yuv420p'
     }
 
-    videoshow(chunks, videoOptions)
+    await fs.promises.mkdir(path.join(__dirname, '../tmp'))
+    const promises: Promise<any>[] = []
+    const files: string[] = []
+    chunks.forEach((chunk, index) => {
+      const filePath = path.join(__dirname, '../tmp', `${now}-${index}.jpg`)
+      files.push(filePath)
+      promises.push(fs.promises.writeFile(filePath, chunk))
+    })
+    await Promise.all(promises)
+
+    videoshow(files, videoOptions)
       .save(path.join(__dirname, '../recordings/test.mp4'))
       .on('start', () => {
         console.log('ffmpeg process started')
@@ -82,6 +93,7 @@ class Camera {
       })
       .on('end', (output: any) => {
         console.log('Video created in: ', output)
+        files.forEach(file => fs.rm(file))
       })
   }
 
