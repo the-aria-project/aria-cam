@@ -32,13 +32,14 @@ try {
 
   args.push('-o')
   args.push('-')
-  args.push('|')
-  args.push('tee')
-  args.push('test_video.mp4')
 
-  const child = childProcess.spawn('raspivid', args, {
+  const child = childProcess.spawn('raspivid --nopreview --width 1280 --height 720 --timeout 0 --framerate 20 --codec MJPEG -o - | tee test_video.mp4', [], {
     stdio: ['ignore', 'pipe', 'inherit'],
   })
+
+  // const child = childProcess.spawn('raspivid', args, {
+  //   stdio: ['ignore', 'pipe', 'inherit'],
+  // })
 
   const stream = child.stdout.pipe(
     new SplitFrames({
