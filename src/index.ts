@@ -8,6 +8,7 @@ import http from 'http'
 import { Worker } from 'worker_threads'
 import { ConfigDestination, CameraFrame } from 'aria-lib/lib/types'
 import { socketEvents } from 'aria-lib'
+import Camera from './Camera'
 import devLog from './lib/devLog'
 import config from '../config.json'
 
@@ -26,14 +27,14 @@ let clients: ServerSocket[] = []
 let currentStream: Buffer[] = []
 
 // Workers
-let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
-  workerData: {
-    width: config.camera.width,
-    height: config.camera.height,
-    timeout: 0,
-    framerate: config.camera.framerate
-  }
-})
+// let videoStreamWorker: Worker = new Worker(path.join(__dirname, '../workers/raspivid-worker.js'), {
+//   workerData: {
+//     width: config.camera.width,
+//     height: config.camera.height,
+//     timeout: 0,
+//     framerate: config.camera.framerate
+//   }
+// })
 
 // Methods
 const sendImageToBrain = (cameraFrame: CameraFrame) => {
@@ -44,34 +45,23 @@ const broadcastToHub = (cameraFrame: CameraFrame) => {
 
 }
 
-const sendVideoToStorage = async () => {
-  readyToProcessVideo = false
-  console.log(`Processing ${currentStream.length} chunks`)
-  const stream = [...currentStream]
-  currentStream = []
+// const sendVideoToStorage = async () => {
+//   readyToProcessVideo = false
+//   console.log(`Processing ${currentStream.length} chunks`)
+//   const stream = [...currentStream]
+//   currentStream = []
 
-  const videoBuffer = Buffer.from(
-    stream
-      .map((b: Buffer) => Buffer.from(b).toString('base64').replace(/^data:image\/(png|jpeg);base64,/, ''))
-      .join(''), 'base64'
-  )
-  fs.promises.writeFile(path.join(__dirname, '../recordings/test.mp4'), videoBuffer)
-}
+//   const videoBuffer = Buffer.from(
+//     stream
+//       .map((b: Buffer) => Buffer.from(b).toString('base64').replace(/^data:image\/(png|jpeg);base64,/, ''))
+//       .join(''), 'base64'
+//   )
+//   fs.promises.writeFile(path.join(__dirname, '../recordings/test.mp4'), videoBuffer)
+// }
 
-const onFrame = (chunk: Buffer) => {
-  const cameraFrame: CameraFrame = {
-    mimeType: 'image/jpg',
-    buffer: Buffer.from(chunk).toString('base64'),
-    timestamp: new Date().getTime(),
-    camera: {
-      width: config.camera.width,
-      height: config.camera.height,
-      fps: config.camera.framerate,
-      host: hostname,
-      friendly_name: config.camera_friendly_name,
-    },
-  }
+const camera = new Camera()
 
+camera.onCameraFrame((cameraFrame: CameraFrame) => {
   if (config.use_live_view) {
     clients.forEach(socket => {
       if (socket) {
@@ -79,27 +69,24 @@ const onFrame = (chunk: Buffer) => {
       }
     })
   }
+})
 
-  if (config.aria_services.use_video_storage) {
-    
-    if (readyToProcessVideo) {
-      sendVideoToStorage()
-    }
-  }
-}
+camera.start()
+  .then(() => console.log('Camera Started'))
+  .catch(err => console.log(err))
 
 // Application
-if (config.aria_services.use_video_storage) {
-  if (!fs.existsSync(path.join(__dirname, '../recordings'))) {
-    fs.mkdirSync(path.join(__dirname, '../recordings'))
-  }
+// if (config.aria_services.use_video_storage) {
+//   if (!fs.existsSync(path.join(__dirname, '../recordings'))) {
+//     fs.mkdirSync(path.join(__dirname, '../recordings'))
+//   }
 
-  setInterval(() => {
-    readyToProcessVideo = true
-  }, 10000)
-}
+//   setInterval(() => {
+//     readyToProcessVideo = true
+//   }, 10000)
+// }
 
-videoStreamWorker.on('message', onFrame)
+// videoStreamWorker.on('message', onFrame)
 
 // Clients
 io.on('connection', (socket: ServerSocket) => {

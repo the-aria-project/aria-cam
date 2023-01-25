@@ -1,3 +1,4 @@
+import fs from 'fs'
 import os from 'os'
 import { CameraFrame } from "aria-lib/lib/types"
 import path from "path"
@@ -12,8 +13,6 @@ type CameraConfig = {
   framerate: number
 }
 
-type FrameHandler = (cameraFrame: CameraFrame) => void
-
 const defaultConfig = {
   width: config.camera.width,
   height: config.camera.height,
@@ -21,21 +20,23 @@ const defaultConfig = {
 }
 
 class Camera {
-  friendlyName: string
-  worker: Worker | null
-  workerPath: string
-  config: CameraConfig
-  onFrame: FrameHandler
-  shouldRecordVideo: boolean
-  readyToProcessVideo: boolean
-  videoProcessingTimer: NodeJS.Timer | null
-  recordingLength: number
-  recordedChunks: Buffer[]
+  private friendlyName: string
+  private worker: Worker | null
+  private workerPath: string
+  private recordingPath: string
+  private config: CameraConfig
+  private onFrame: (cameraFrame: CameraFrame) => void
+  private shouldRecordVideo: boolean
+  private readyToProcessVideo: boolean
+  private videoProcessingTimer: NodeJS.Timer | null
+  private recordingLength: number
+  private recordedChunks: Buffer[]
 
   constructor() {
     this.friendlyName = config.camera_friendly_name
     this.worker = null
     this.workerPath = path.join(__dirname, '../workers/raspivid-worker.js')
+    this.recordingPath = path.join(__dirname, '../recordings')
     this.config = defaultConfig
     this.onFrame = () => {}
 
@@ -64,6 +65,13 @@ class Camera {
 
     if (this.shouldRecordVideo) {
       this.recordedChunks.push(chunk)
+
+      if (this.readyToProcessVideo) {
+        this.readyToProcessVideo = false
+        console.log(`Processing ${this.recordedChunks.length} chunks`)
+        this.recordedChunks = []
+      }
+      
     }
     
   }
@@ -96,6 +104,13 @@ class Camera {
     await this.startWorker()
 
     if (this.shouldRecordVideo) {
+
+      // Create recordings folder if one doesn't exist
+      if (!fs.existsSync(this.recordingPath)) {
+        fs.mkdirSync(this.recordingPath)
+      }
+      
+      // Start Timer
       this.videoProcessingTimer = setInterval(() => {
         this.readyToProcessVideo = true
       }, this.recordingLength)
@@ -117,8 +132,10 @@ class Camera {
     await this.stopWorker()
   }
 
-  onCameraFrame(frameHandler: FrameHandler) {
+  onCameraFrame(frameHandler: (cameraFrame: CameraFrame) => void) {
     this.onFrame = frameHandler
   }
   
 }
+
+export default Camera
