@@ -9,22 +9,6 @@ const videoshow = require('videoshow')
 
 const hostname = os.hostname()
 
-const digitNumberString = (input: number | string, digits?: number) => {
-  let precedingZeros = ''
-
-  if (digits === 0 || !digits) {
-    precedingZeros = ''
-  } else if (String(Number(input)).length >= digits) {
-    precedingZeros = ''
-  } else {
-    for (let i = 0; i < digits - String(Number(input)).length; i++) {
-      precedingZeros += '0'
-    }
-  }
-
-  return precedingZeros + String(Number(input))
-}
-
 type CameraConfig = {
   width: number
   height: number
@@ -94,40 +78,40 @@ class Camera {
       console.log(index)
       const filePath = path.join(storageDir, `${index.toString().padStart(chunks.length.toString().length, '0')}.jpeg`)
       console.log(filePath)
-      // files.push(filePath)
-      // const promise = new Promise((resolve, reject) => {
-      //   fs.promises.writeFile(filePath, chunk)
-      //     .then(() => {
-      //       console.log(`Wrote ${filePath}`)
-      //       resolve(filePath)
-      //     })
-      //     .catch(err => {
-      //       console.log(err)
-      //       reject(err)
-      //     })
-      // })
-      // promises.push(promise)
+      files.push(filePath)
+      const promise = new Promise((resolve, reject) => {
+        fs.promises.writeFile(filePath, chunk)
+          .then(() => {
+            console.log(`Wrote ${filePath}`)
+            resolve(filePath)
+          })
+          .catch(err => {
+            console.log(err)
+            reject(err)
+          })
+      })
+      promises.push(promise)
     })
-    // await Promise.all(promises)
-    // console.log('Files written, starting ffmpeg')
-    // const inputImageValue = path.join(storageDir, `%0${String(chunks).length}d.jpeg`)
-    // console.log(inputImageValue)
-    // const proc = spawn('ffmpeg', [
-    //   '-r', '20',
-    //   '-s', '1280x720',
-    //   '-i', inputImageValue,
-    //   '-vcodec', 'libx264',
-    //   '-crf', '25',
-    //   'test.mp4'
-    // ])
+    await Promise.all(promises)
+    console.log('Files written, starting ffmpeg')
+    const inputImageValue = path.join(storageDir, `%0${chunks.length.toString().length}d.jpeg`)
+    console.log(inputImageValue)
+    const proc = spawn('ffmpeg', [
+      '-r', '20',
+      '-s', '1280x720',
+      '-i', inputImageValue,
+      '-vcodec', 'libx264',
+      '-crf', '25',
+      'test.mp4'
+    ])
 
-    // proc.on('close', () => {
-    //   console.log('Completed, cleaning up...')
-    //   fs.promises.rm(storageDir, { recursive: true, force: true })
-    //     .then(() => {
-    //       console.log('Done cleaning jpegs')
-    //     })
-    // })
+    proc.on('close', () => {
+      console.log('Completed, cleaning up...')
+      fs.promises.rm(storageDir, { recursive: true, force: true })
+        .then(() => {
+          console.log('Done cleaning jpegs')
+        })
+    })
   }
 
   onWorkerFrame(chunk: Buffer) {
