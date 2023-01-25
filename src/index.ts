@@ -68,6 +68,11 @@ app.get('/download', (req: Request, res: Response) => {
   res.download(file)
 })
 
+app.get('/file', (req: Request, res: Response) => {
+  const file = path.join(__dirname, '../recordings/test_video.h264')
+  res.sendFile(file)
+})
+
 // Start server
 server.listen(config.server_port, () => {
   devLog(`Camera server running on port ${config.server_port}`)
