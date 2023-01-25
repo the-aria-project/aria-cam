@@ -20,17 +20,17 @@ const defaultConfig = {
 }
 
 class Camera {
-  private friendlyName: string
-  private worker: Worker | null
-  private workerPath: string
-  private recordingPath: string
-  private config: CameraConfig
-  private onFrame: (cameraFrame: CameraFrame) => void
-  private shouldRecordVideo: boolean
-  private readyToProcessVideo: boolean
-  private videoProcessingTimer: NodeJS.Timer | null
-  private recordingLength: number
-  private recordedChunks: Buffer[]
+  friendlyName: string
+  worker: Worker | null
+  workerPath: string
+  recordingPath: string
+  config: CameraConfig
+  onFrame: (cameraFrame: CameraFrame) => void
+  shouldRecordVideo: boolean
+  readyToProcessVideo: boolean
+  videoProcessingTimer: NodeJS.Timer | null
+  recordingLength: number
+  recordedChunks: Buffer[]
 
   constructor() {
     this.friendlyName = config.camera_friendly_name
@@ -46,15 +46,15 @@ class Camera {
     this.recordingLength = 10000
     this.recordedChunks = []
 
-    this.onWorkerFrame.bind(this)
-    this.stopWorker.bind(this)
-    this.startWorker.bind(this)
-    this.start.bind(this)
-    this.stop.bind(this)
-    this.onCameraFrame.bind(this)
+    // this.onWorkerFrame.bind(this)
+    // this.stopWorker.bind(this)
+    // this.startWorker.bind(this)
+    // this.start.bind(this)
+    // this.stop.bind(this)
+    // this.onCameraFrame.bind(this)
   }
 
-  private onWorkerFrame(chunk: Buffer) {
+  onWorkerFrame(chunk: Buffer) {
     const cameraFrame: CameraFrame = {
       mimeType: 'image/jpg',
       buffer: Buffer.from(chunk).toString('base64'),
@@ -83,7 +83,7 @@ class Camera {
     
   }
 
-  private async stopWorker() {
+  async stopWorker() {
     if (this.worker !== null) {
       this.worker.off('message', this.onWorkerFrame)
       await this.worker.terminate()
@@ -91,7 +91,7 @@ class Camera {
     }
   }
 
-  private async startWorker() {
+  async startWorker() {
     await this.stopWorker()
 
     this.worker = new Worker(this.workerPath, {
