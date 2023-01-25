@@ -4,6 +4,7 @@ import { CameraFrame } from "aria-lib/lib/types"
 import path from "path"
 import { Worker } from "worker_threads"
 import config from '../config.json'
+import { spawn } from 'child_process'
 const videoshow = require('videoshow')
 
 const hostname = os.hostname()
@@ -83,7 +84,7 @@ class Camera {
     const files: string[] = []
     console.log('Starting promises')
     chunks.forEach((chunk, index) => {
-      const filePath = path.join(__dirname, '../tmp', `${now}-${index}.jpg`)
+      const filePath = path.join(__dirname, '../tmp', `${now}-000${index}.jpeg`)
       files.push(filePath)
       const promise = new Promise((resolve, reject) => {
         fs.promises.writeFile(filePath, chunk)
@@ -99,22 +100,19 @@ class Camera {
       promises.push(promise)
     })
     await Promise.all(promises)
-    console.log('Files written, starting video show')
+    console.log('Files written, starting ffmpeg')
+    const proc = spawn('ffmpeg', [
+      '-r', '20',
+      '-s', '1280x720',
+      '-i', `${now}-*.jpeg`,
+      '-vcodec', 'libx264',
+      '-crf', '25',
+      'test.mp4'
+    ])
 
-    videoshow(files, videoOptions)
-      .save(path.join(__dirname, '../recordings/test.mp4'))
-      .on('start', () => {
-        console.log('ffmpeg process started')
-      })
-      .on('error', (err: any, stdout: any, stderr: any) => {
-        console.log(err)
-        console.log(stdout)
-        console.log(stderr)
-      })
-      .on('end', (output: any) => {
-        console.log('Video created in: ', output)
-        files.forEach(file => fs.rm(file, () => {}))
-      })
+    proc.on('close', () => {
+      console.log('Completed')
+    })
   }
 
   onWorkerFrame(chunk: Buffer) {
