@@ -9,6 +9,14 @@ const videoshow = require('videoshow')
 
 const hostname = os.hostname()
 
+const digitNumberString: (input: string | number, digits?: number) => string = (input, digits) => {
+  if (digits === 0 || !digits) {
+    return String(Number(input))
+  }
+
+  return `${'0'.repeat(digits - String(Number(input)).length)}${String(Number(input))}`
+}
+
 type CameraConfig = {
   width: number
   height: number
@@ -40,7 +48,7 @@ class Camera {
     this.workerPath = path.join(__dirname, '../workers/raspivid-worker.js')
     this.recordingPath = path.join(__dirname, '../recordings')
     this.config = defaultConfig
-    this.onFrame = () => {}
+    this.onFrame = () => { }
 
     this.shouldRecordVideo = config.aria_services.use_video_storage
     this.readyToProcessVideo = false
@@ -59,32 +67,22 @@ class Camera {
 
   async processVideo(chunks: Buffer[]) {
     console.log(`Processing video from ${chunks.length} chunks`)
-    const tmpPath = path.join(__dirname, '../tmp')
     const now = new Date().getTime()
-    const videoOptions = {
-      fps: 25,
-      loop: 0,
-      transition: false,
-      transitionDuration: 0,
-      videoBitrate: 1024,
-      videoCodec: 'libx264',
-      size: '640x?',
-      audioBitrate: '128k',
-      audioChannels: 1,
-      format: 'mp4',
-      pixelFormat: 'yuv420p'
-    }
+    const tmpPath = path.join(__dirname, '../tmp')
+    const storageDir = path.join(tmpPath, `${now}`)
 
     if (!fs.existsSync(tmpPath)) {
       console.log('Creating tmp path')
-      await fs.promises.mkdir(path.join(__dirname, '../tmp'))
+      await fs.promises.mkdir(tmpPath)
     }
-    
+
+    await fs.promises.mkdir(storageDir)
+
     const promises: Promise<any>[] = []
     const files: string[] = []
     console.log('Starting promises')
     chunks.forEach((chunk, index) => {
-      const filePath = path.join(__dirname, '../tmp', `${now}-000${index}.jpeg`)
+      const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
       files.push(filePath)
       const promise = new Promise((resolve, reject) => {
         fs.promises.writeFile(filePath, chunk)
@@ -104,7 +102,7 @@ class Camera {
     const proc = spawn('ffmpeg', [
       '-r', '20',
       '-s', '1280x720',
-      '-i', `${now}-*.jpeg`,
+      '-i', `${path.join(storageDir, `%0${String(chunks).length}d.jpeg`)}`,
       '-vcodec', 'libx264',
       '-crf', '25',
       'test.mp4'
@@ -139,9 +137,9 @@ class Camera {
         this.processVideo(this.recordedChunks)
         this.recordedChunks = []
       }
-      
+
     }
-    
+
   }
 
   async stopWorker() {
@@ -177,13 +175,13 @@ class Camera {
       if (!fs.existsSync(this.recordingPath)) {
         fs.mkdirSync(this.recordingPath)
       }
-      
+
       // Start Timer
       this.videoProcessingTimer = setInterval(() => {
         this.readyToProcessVideo = true
       }, this.recordingLength)
     }
-    
+
   }
 
   async stop() {
@@ -194,7 +192,7 @@ class Camera {
         clearInterval(this.videoProcessingTimer)
         this.videoProcessingTimer = null
       }
-      
+
     }
 
     await this.stopWorker()
@@ -203,7 +201,7 @@ class Camera {
   onCameraFrame(frameHandler: (cameraFrame: CameraFrame) => void) {
     this.onFrame = frameHandler
   }
-  
+
 }
 
 export default Camera
