@@ -106,8 +106,10 @@ class Camera {
       .on('start', () => {
         console.log('ffmpeg process started')
       })
-      .on('error', (err: any) => {
+      .on('error', (err: any, stdout: any, stderr: any) => {
         console.log(err)
+        console.log(stdout)
+        console.log(stderr)
       })
       .on('end', (output: any) => {
         console.log('Video created in: ', output)
