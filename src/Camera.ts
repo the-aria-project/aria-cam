@@ -58,6 +58,7 @@ class Camera {
 
   async processVideo(chunks: Buffer[]) {
     console.log('Processing video')
+    const tmpPath = path.join(__dirname, '../tmp')
     const now = new Date().getTime()
     const videoOptions = {
       fps: 25,
@@ -73,7 +74,10 @@ class Camera {
       pixelFormat: 'yuv420p'
     }
 
-    await fs.promises.mkdir(path.join(__dirname, '../tmp'))
+    if (!fs.existsSync(tmpPath)) {
+      await fs.promises.mkdir(path.join(__dirname, '../tmp'))
+    }
+    
     const promises: Promise<any>[] = []
     const files: string[] = []
     chunks.forEach((chunk, index) => {
