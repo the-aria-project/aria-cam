@@ -34,6 +34,10 @@ try {
   args.push('-o')
   args.push('-')
 
+  const child = childProcess.spawn('raspivid', args, {
+    stdio: ['ignore', 'pipe', 'inherit'],
+  })
+
   const stream = child.stdout.pipe(
     new SplitFrames({
       startWith: JPEG_START,
