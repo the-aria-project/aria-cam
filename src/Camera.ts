@@ -78,20 +78,21 @@ class Camera {
     const now = new Date().getTime()
     const tmpPath = path.join(__dirname, '../tmp')
     const storageDir = path.join(tmpPath, `${now}`)
+    console.log('Done')
 
-    if (!fs.existsSync(tmpPath)) {
-      console.log('Creating tmp path')
-      await fs.promises.mkdir(tmpPath)
-    }
+    // if (!fs.existsSync(tmpPath)) {
+    //   console.log('Creating tmp path')
+    //   await fs.promises.mkdir(tmpPath)
+    // }
 
-    await fs.promises.mkdir(storageDir)
+    // await fs.promises.mkdir(storageDir)
 
-    const promises: Promise<any>[] = []
-    const files: string[] = []
-    console.log('Starting promises')
-    chunks.forEach((chunk, index) => {
-      const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
-      console.log(filePath)
+    // const promises: Promise<any>[] = []
+    // const files: string[] = []
+    // console.log('Starting promises')
+    // chunks.forEach((chunk, index) => {
+    //   const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
+    //   console.log(filePath)
       // files.push(filePath)
       // const promise = new Promise((resolve, reject) => {
       //   fs.promises.writeFile(filePath, chunk)
@@ -105,11 +106,11 @@ class Camera {
       //     })
       // })
       // promises.push(promise)
-    })
+    // })
     // await Promise.all(promises)
     // console.log('Files written, starting ffmpeg')
-    const inputImageValue = path.join(storageDir, `%0${String(chunks).length}d.jpeg`)
-    console.log(inputImageValue)
+    // const inputImageValue = path.join(storageDir, `%0${String(chunks).length}d.jpeg`)
+    // console.log(inputImageValue)
     // const proc = spawn('ffmpeg', [
     //   '-r', '20',
     //   '-s', '1280x720',
