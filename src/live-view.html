@@ -15,16 +15,16 @@
   <body>
     <h1>Hey</h1>
     <div id="cam-container">
-      <video src="/video"></video>
+      
     </div>
   </body>
-  <!-- <script src="/socket.io/socket.io.js"></script> -->
-  <!-- <script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
     const camContainer = document.getElementById('cam-container')
     const socket = io()
     
     socket.on('aria:camera:frame', ({ mimeType, buffer }) => {
       camContainer.innerHTML = `<img src="data:${mimeType};base64, ${buffer}" />`
     })
-  </script> -->
+  </script>
 </html>

@@ -4,6 +4,7 @@ import { CameraFrame } from "aria-lib/lib/types"
 import path from "path"
 import { Worker } from "worker_threads"
 import config from '../config.json'
+const videoshow = require('videoshow')
 
 const hostname = os.hostname()
 
@@ -57,6 +58,31 @@ class Camera {
 
   async processVideo(chunks: Buffer[]) {
     console.log('Processing video')
+    const videoOptions = {
+      fps: 25,
+      loop: 0,
+      transition: false,
+      transitionDuration: 0,
+      videoBitrate: 1024,
+      videoCodec: 'libx264',
+      size: '640x?',
+      audioBitrate: '128k',
+      audioChannels: 1,
+      format: 'mp4',
+      pixelFormat: 'yuv420p'
+    }
+
+    videoshow(chunks, videoOptions)
+      .save(path.join(__dirname, '../recordings/test.mp4'))
+      .on('start', () => {
+        console.log('ffmpeg process started')
+      })
+      .on('error', (err: any) => {
+        console.log(err)
+      })
+      .on('end', (output: any) => {
+        console.log('Video created in: ', output)
+      })
   }
 
   onWorkerFrame(chunk: Buffer) {

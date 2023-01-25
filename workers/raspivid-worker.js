@@ -34,25 +34,16 @@ try {
   args.push('-o')
   args.push('-')
 
-  // For Testing
-  args.pop()
-  args.push(`${path.join(__dirname, '../recordings/test.mjpg')}`)
-  console.log(args)
+  const stream = child.stdout.pipe(
+    new SplitFrames({
+      startWith: JPEG_START,
+      endWith: JPEG_END,
+    })
+  )
 
-  const child = childProcess.spawn('raspivid', args, {
-    stdio: ['ignore', 'pipe', 'inherit'],
+  stream.on('data', chunk => {
+    parentPort.postMessage(chunk)
   })
-
-  // const stream = child.stdout.pipe(
-  //   new SplitFrames({
-  //     startWith: JPEG_START,
-  //     endWith: JPEG_END,
-  //   })
-  // )
-
-  // stream.on('data', chunk => {
-  //   parentPort.postMessage(chunk)
-  // })
 } catch (err) {
   throw err
 }

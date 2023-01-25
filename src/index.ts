@@ -64,12 +64,12 @@ if (config.use_live_view) {
 }
 
 app.get('/download', (req: Request, res: Response) => {
-  const file = path.join(__dirname, '../recordings/test.mjpg')
+  const file = path.join(__dirname, '../recordings/test.mp4')
   res.download(file)
 })
 
 app.get('/video', (req: Request, res: Response) => {
-  const file = path.join(__dirname, '../recordings/test.mjpg')
+  const file = path.join(__dirname, '../recordings/test.mp4')
   res.sendFile(file)
 })
 
