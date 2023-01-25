@@ -17,11 +17,11 @@ const digitNumberString = (input: number | string, digits?: number) => {
   } else if (String(Number(input)).length >= digits) {
     precedingZeros = ''
   } else {
-    precedingZeros = '0'.repeat(digits - String(Number(input)).length)
+    for (let i = 0; i < digits - String(Number(input)).length; i++) {
+      precedingZeros += '0'
+    }
   }
 
-  console.log(precedingZeros)
-  
   return precedingZeros + String(Number(input))
 }
 
@@ -92,8 +92,7 @@ class Camera {
     console.log('Starting promises')
     chunks.forEach((chunk, index) => {
       console.log(index)
-      const filePath = path.join(storageDir, `test.jpeg`)
-      // const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
+      const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
       // console.log(filePath)
       // files.push(filePath)
       // const promise = new Promise((resolve, reject) => {
