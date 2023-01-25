@@ -92,7 +92,8 @@ class Camera {
     console.log('Starting promises')
     chunks.forEach((chunk, index) => {
       console.log(index)
-      const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
+      const filePath = path.join(storageDir, `test.jpeg`)
+      // const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
       // console.log(filePath)
       // files.push(filePath)
       // const promise = new Promise((resolve, reject) => {
