@@ -87,9 +87,9 @@ class Camera {
 
     await fs.promises.mkdir(storageDir)
 
-    // const promises: Promise<any>[] = []
-    // const files: string[] = []
-    // console.log('Starting promises')
+    const promises: Promise<any>[] = []
+    const files: string[] = []
+    console.log('Starting promises')
     // chunks.forEach((chunk, index) => {
     //   const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
     //   console.log(filePath)
