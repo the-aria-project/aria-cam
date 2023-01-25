@@ -80,10 +80,10 @@ class Camera {
     const storageDir = path.join(tmpPath, `${now}`)
     console.log('Done')
 
-    // if (!fs.existsSync(tmpPath)) {
-    //   console.log('Creating tmp path')
-    //   await fs.promises.mkdir(tmpPath)
-    // }
+    if (!fs.existsSync(tmpPath)) {
+      console.log('Creating tmp path')
+      await fs.promises.mkdir(tmpPath)
+    }
 
     // await fs.promises.mkdir(storageDir)
 
