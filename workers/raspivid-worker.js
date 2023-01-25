@@ -32,6 +32,9 @@ try {
 
   args.push('-o')
   args.push('-')
+  args.push('|')
+  args.push('tee')
+  args.push('test_video.mp4')
 
   const child = childProcess.spawn('raspivid', args, {
     stdio: ['ignore', 'pipe', 'inherit'],

@@ -22,6 +22,9 @@ Install NodeJS
 2. `sudo apt install nodejs`
 3. `node --version` (to ensure nodejs is properly installed)
 
+Install FFmpeg
+`sudo apt install -y ffmpeg`
+
 Download And Setup the program
 1. `cd ~`
 2. `git clone https://github.com/the-aria-project/aria-cam.git`
