@@ -19,7 +19,7 @@ try {
     height,
     timeout,
     framerate,
-    codec: 'MP4'
+    codec: 'MJPEG'
   }
 
   const args = ['--nopreview']
@@ -34,7 +34,7 @@ try {
   args.push('-o')
   args.push('-')
 
-  const child = childProcess.spawn(`raspivid --nopreview --width 1280 --height 720 --timeout 0 --framerate 20 --codec MJPEG -o - | tee ${path.join(__dirname, '../recordings/test_video.mp4')}`, {
+  const child = childProcess.spawn(`raspivid --nopreview --width 1280 --height 720 --timeout 0 --framerate 20 --codec MP4 -o - | tee ${path.join(__dirname, '../recordings/test_video.mp4')}`, {
     stdio: ['ignore', 'pipe', 'inherit'],
     shell: true,
   })
