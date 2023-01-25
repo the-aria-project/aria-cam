@@ -34,7 +34,7 @@ try {
   args.push('-o')
   args.push('-')
 
-  const child = childProcess.spawn(`raspivid --nopreview --width 1280 --height 720 --timeout 0 --framerate 20 -o - | tee ${path.join(__dirname, '../recordings/test_video.h264')}`, {
+  const child = childProcess.spawn(`raspivid --nopreview --width 1280 --height 720 --timeout 0 --framerate 20 -o - | tee ${path.join(__dirname, '../recordings/test_video.h264')} | MP4Box -fps 20 -add ${path.join(__dirname, '../recordings/test_video.h264')} | ${path.join(__dirname, '../recordings/test_video.mp4')}`, {
     stdio: ['ignore', 'pipe', 'inherit'],
     shell: true,
   })
