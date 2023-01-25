@@ -10,15 +10,19 @@ const videoshow = require('videoshow')
 const hostname = os.hostname()
 
 const digitNumberString = (input: number | string, digits?: number) => {
-  console.log('Here')
+  let precedingZeros = ''
+
   if (digits === 0 || !digits) {
-    console.log(String(Number(input)))
-    return String(Number(input))
+    precedingZeros = ''
+  } else if (String(Number(input)).length >= digits) {
+    precedingZeros = ''
+  } else {
+    precedingZeros = '0'.repeat(digits - String(Number(input)).length)
   }
 
-  console.log('Over here')
-  console.log(`${'0'.repeat(digits - String(Number(input)).length)}${String(Number(input))}`)
-  return `${'0'.repeat(digits - String(Number(input)).length)}${String(Number(input))}`
+  console.log(precedingZeros)
+  
+  return precedingZeros + String(Number(input))
 }
 
 type CameraConfig = {
