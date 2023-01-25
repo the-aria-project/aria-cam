@@ -85,7 +85,7 @@ class Camera {
       await fs.promises.mkdir(tmpPath)
     }
 
-    // await fs.promises.mkdir(storageDir)
+    await fs.promises.mkdir(storageDir)
 
     // const promises: Promise<any>[] = []
     // const files: string[] = []
