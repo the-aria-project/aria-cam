@@ -4,6 +4,7 @@ import { CameraFrame } from "aria-lib/lib/types"
 import path from "path"
 import { Worker } from "worker_threads"
 import config from '../config.json'
+const mjpeg = require('mp4-mjpeg')
 
 const hostname = os.hostname()
 
@@ -54,6 +55,19 @@ class Camera {
     this.onCameraFrame = this.onCameraFrame.bind(this)
   }
 
+  async processVideo() {
+    const recordingFilePath = path.join(this.recordingPath, `${new Date().getTime()}.mp4`)
+    const recorder = await mjpeg({ fileName: recordingFilePath })
+    const promises: Buffer[] = []
+    this.recordedChunks.forEach((chunk: Buffer) => {
+      promises.push(recorder.appendImageBuffer(chunk))
+    })
+
+    await Promise.all(promises)
+    await recorder.finalize()
+    console.log(`${recordingFilePath} saved`)
+  }
+
   onWorkerFrame(chunk: Buffer) {
     const cameraFrame: CameraFrame = {
       mimeType: 'image/jpg',
@@ -75,7 +89,6 @@ class Camera {
 
       if (this.readyToProcessVideo) {
         this.readyToProcessVideo = false
-        console.log(`Processing ${this.recordedChunks.length} chunks`)
         this.recordedChunks = []
       }
       
