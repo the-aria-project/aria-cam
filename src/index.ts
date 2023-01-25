@@ -64,7 +64,7 @@ if (config.use_live_view) {
 }
 
 app.get('/download', (req: Request, res: Response) => {
-  const file = path.join(__dirname, '../recordings/test_video.h264')
+  const file = path.join(__dirname, '../recordings/test.mjpg')
   res.download(file)
 })
 
