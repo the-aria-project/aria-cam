@@ -47,6 +47,7 @@ class Camera {
     this.recordingLength = 10000
     this.recordedChunks = []
 
+    this.processVideo = this.processVideo.bind(this)
     this.onWorkerFrame = this.onWorkerFrame.bind(this)
     this.stopWorker = this.stopWorker.bind(this)
     this.startWorker = this.startWorker.bind(this)
@@ -55,11 +56,11 @@ class Camera {
     this.onCameraFrame = this.onCameraFrame.bind(this)
   }
 
-  async processVideo() {
+  async processVideo(chunks: Buffer[]) {
     const recordingFilePath = path.join(this.recordingPath, `${new Date().getTime()}.mp4`)
     const recorder = await mjpeg({ fileName: recordingFilePath })
     const promises: Buffer[] = []
-    this.recordedChunks.forEach((chunk: Buffer) => {
+    chunks.forEach((chunk: Buffer) => {
       promises.push(recorder.appendImageBuffer(chunk))
     })
 
@@ -89,6 +90,7 @@ class Camera {
 
       if (this.readyToProcessVideo) {
         this.readyToProcessVideo = false
+        this.processVideo(this.recordedChunks)
         this.recordedChunks = []
       }
       
