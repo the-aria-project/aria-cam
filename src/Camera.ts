@@ -109,7 +109,11 @@ class Camera {
     ])
 
     proc.on('close', () => {
-      console.log('Completed')
+      console.log('Completed, cleaning up...')
+      fs.promises.rm(storageDir, { recursive: true, force: true })
+        .then(() => {
+          console.log('Done cleaning jpegs')
+        })
     })
   }
 
