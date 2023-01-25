@@ -73,6 +73,9 @@ app.get('/video', (req: Request, res: Response) => {
   res.sendFile(file)
 })
 
+app.use(express.static('../recordings'))
+app.use(express.static('../tmp'))
+
 // Start server
 server.listen(config.server_port, () => {
   devLog(`Camera server running on port ${config.server_port}`)
