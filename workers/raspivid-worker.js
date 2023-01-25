@@ -19,7 +19,7 @@ try {
     height,
     timeout,
     framerate,
-    codec: 'MJPEG'
+    codec: 'MP4'
   }
 
   const args = ['--nopreview']
