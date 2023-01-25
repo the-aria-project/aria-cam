@@ -90,23 +90,24 @@ class Camera {
     const promises: Promise<any>[] = []
     const files: string[] = []
     console.log('Starting promises')
-    // chunks.forEach((chunk, index) => {
-    //   const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
-    //   console.log(filePath)
-    //   files.push(filePath)
-    //   const promise = new Promise((resolve, reject) => {
-    //     fs.promises.writeFile(filePath, chunk)
-    //       .then(() => {
-    //         console.log(`Wrote ${filePath}`)
-    //         resolve(filePath)
-    //       })
-    //       .catch(err => {
-    //         console.log(err)
-    //         reject(err)
-    //       })
-    //   })
-    //   promises.push(promise)
-    // })
+    chunks.forEach((chunk, index) => {
+      console.log(index)
+      // const filePath = path.join(storageDir, `${digitNumberString(index, String(chunks).length)}.jpeg`)
+      // console.log(filePath)
+      // files.push(filePath)
+      // const promise = new Promise((resolve, reject) => {
+      //   fs.promises.writeFile(filePath, chunk)
+      //     .then(() => {
+      //       console.log(`Wrote ${filePath}`)
+      //       resolve(filePath)
+      //     })
+      //     .catch(err => {
+      //       console.log(err)
+      //       reject(err)
+      //     })
+      // })
+      // promises.push(promise)
+    })
     // await Promise.all(promises)
     // console.log('Files written, starting ffmpeg')
     // const inputImageValue = path.join(storageDir, `%0${String(chunks).length}d.jpeg`)
