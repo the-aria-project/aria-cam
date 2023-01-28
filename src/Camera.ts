@@ -131,13 +131,13 @@ class Camera {
     this.onFrame(cameraFrame)
 
     if (this.shouldRecordVideo) {
-      this.recordedChunks.push(chunk)
+      // this.recordedChunks.push(chunk)
 
-      if (this.readyToProcessVideo) {
-        this.readyToProcessVideo = false
-        this.processVideo(this.recordedChunks)
-        this.recordedChunks = []
-      }
+      // if (this.readyToProcessVideo) {
+      //   this.readyToProcessVideo = false
+      //   this.processVideo(this.recordedChunks)
+      //   this.recordedChunks = []
+      // }
 
     }
 
